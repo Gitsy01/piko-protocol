@@ -1,0 +1,40 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="128" fill="#05050b"/>
+  <rect x="24" y="24" width="464" height="464" rx="104" stroke="url(#frame)" stroke-width="16"/>
+  <path d="M256 94C177.6 94 114 157.6 114 236C114 341.6 238.6 430.8 250.8 439.2C254 441.6 258 441.6 261.2 439.2C273.4 430.8 398 341.6 398 236C398 157.6 334.4 94 256 94Z" fill="url(#pinFill)"/>
+  <path d="M256 118C190.8 118 138 170.8 138 236C138 317 228 390 256 410.2C284 390 374 317 374 236C374 170.8 321.2 118 256 118Z" fill="#11111d" stroke="url(#rim)" stroke-width="10"/>
+  <circle cx="256" cy="222" r="76" fill="#0a0a12" stroke="url(#ring)" stroke-width="14"/>
+  <path d="M180 222C180 180.026 214.026 146 256 146C297.974 146 332 180.026 332 222H180Z" fill="#ff6b2c"/>
+  <path d="M180 222H332C332 263.974 297.974 298 256 298C214.026 298 180 263.974 180 222Z" fill="#f5f2ff"/>
+  <rect x="180" y="214" width="152" height="16" rx="8" fill="#9945ff"/>
+  <circle cx="256" cy="222" r="28" fill="#05050b" stroke="#14f195" stroke-width="14"/>
+  <circle cx="256" cy="222" r="12" fill="#f5f2ff"/>
+  <circle cx="256" cy="222" r="108" stroke="url(#halo)" stroke-width="8" opacity="0.55"/>
+  <circle cx="148" cy="126" r="20" fill="#14f195" opacity="0.7"/>
+  <circle cx="376" cy="384" r="14" fill="#9945ff" opacity="0.72"/>
+  <circle cx="410" cy="154" r="12" fill="#ff6b2c" opacity="0.74"/>
+  <defs>
+    <linearGradient id="frame" x1="56" y1="40" x2="462" y2="484" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff6b2c"/>
+      <stop offset="0.55" stop-color="#9945ff"/>
+      <stop offset="1" stop-color="#14f195"/>
+    </linearGradient>
+    <linearGradient id="pinFill" x1="160" y1="110" x2="364" y2="410" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1a1a2b"/>
+      <stop offset="1" stop-color="#0b0c15"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="154" y1="130" x2="352" y2="412" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff6b2c"/>
+      <stop offset="0.55" stop-color="#9945ff"/>
+      <stop offset="1" stop-color="#14f195"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="182" y1="158" x2="330" y2="288" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9945ff"/>
+      <stop offset="1" stop-color="#14f195"/>
+    </linearGradient>
+    <linearGradient id="halo" x1="148" y1="116" x2="366" y2="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff6b2c"/>
+      <stop offset="1" stop-color="#14f195"/>
+    </linearGradient>
+  </defs>
+</svg>

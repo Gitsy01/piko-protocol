@@ -1,0 +1,18 @@
+{
+  "name": "@depokemongo/ai",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@depokemongo/common": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

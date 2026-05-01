@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──── Merchant ────
+model Merchant {
+  id             String   @id @default(cuid())
+  wallet         String   @unique
+  name           String
+  description    String?
+  category       Category
+  lat            Float
+  lng            Float
+  locationHash   String
+  imageUrl       String?
+  isVerified     Boolean  @default(false)
+  stakeAmount    Float    @default(0)
+  rating         Float    @default(0)
+  totalVisits    Int      @default(0)
+  conversionRate Float    @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  quests       Quest[]
+  transactions Transaction[]
+  analytics    MerchantAnalytics[]
+}
+
+enum Category {
+  CAFE
+  RESTAURANT
+  RETAIL
+  GROCERY
+  ENTERTAINMENT
+  FITNESS
+  BEAUTY
+  OTHER
+}
+
+// ──── Quest ────
+model Quest {
+  id              String    @id @default(cuid())
+  merchantId      String
+  merchant        Merchant  @relation(fields: [merchantId], references: [id])
+  title           String
+  description     String
+  rewardAmount    Float
+  rewardToken     String    @default("PIKO")
+  xpReward        Int       @default(10)
+  minSpend        Float     @default(0)
+  maxClaims       Int       @default(100)
+  claimedCount    Int       @default(0)
+  questType       QuestType
+  conditions      Json?
+  expiresAt       DateTime
+  isActive        Boolean   @default(true)
+  onChainId       String?
+  onChainWallet   String?
+  onChainQuestPda String?
+  createdAt       DateTime  @default(now())
+
+  claims QuestClaim[]
+}
+
+enum QuestType {
+  VISIT
+  PURCHASE
+  REPEAT
+  CHAIN
+  SPONSORED
+}
+
+// ──── Quest Claim ────
+model QuestClaim {
+  id          String      @id @default(cuid())
+  questId     String
+  quest       Quest       @relation(fields: [questId], references: [id])
+  userWallet  String
+  txSignature String?
+  rewardTx    String?
+  status      ClaimStatus @default(PENDING)
+  claimedAt   DateTime    @default(now())
+  verifiedAt  DateTime?
+
+  rewardLedger RewardLedger?
+
+  @@unique([questId, userWallet])
+}
+
+enum ClaimStatus {
+  PENDING
+  VERIFIED
+  FAILED
+  REWARDED
+  REJECTED
+  EXPIRED
+}
+
+// ──── Transaction ────
+model Transaction {
+  id                String   @id @default(cuid())
+  merchantId        String
+  merchant          Merchant @relation(fields: [merchantId], references: [id])
+  userWallet        String
+  questId           String?
+  claimId           String?  @unique
+  reference         String?  @unique
+  amount            Float
+  amountLamports    BigInt?
+  token             String   @default("SOL")
+  tokenMint         String?
+  txSignature       String   @unique
+  rewardTx          String?
+  rewardAmountBaseUnits BigInt?
+  rewardMultiplier  Float?
+  rewardToken       String?
+  rewardReasons     Json?
+  fraudScore        Float?
+  worldVerified     Boolean?
+  decision          String?
+  aiSummary         String?
+  xpEarned          Int?
+  newLevel          Int?
+  nftMint           String?
+  nftTxSignature    String?
+  completedAt       DateTime?
+  recipientWallet   String?
+  recipientVerified Boolean  @default(false)
+  isVerified        Boolean  @default(false)
+  createdAt         DateTime @default(now())
+}
+
+// ──── User ────
+model User {
+  id              String   @id @default(cuid())
+  wallet          String   @unique
+  displayName     String?
+  avatarUrl       String?
+  worldVerified   Boolean  @default(false)
+  worldNullifier  String?  @unique
+  xp              Int      @default(0)
+  level           Int      @default(1)
+  totalRewardsBaseUnits BigInt @default(0)
+  totalRewards    Float    @default(0)
+  questsCompleted Int      @default(0)
+  streak          Int      @default(0)
+  lastActiveAt    DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  badges Badge[]
+}
+
+// ──── Badge / NFT ────
+model Badge {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  name        String
+  description String
+  imageUrl    String
+  nftMint     String?
+  earnedAt    DateTime @default(now())
+}
+
+model RewardLedger {
+  id              String    @id @default(cuid())
+  claimId         String    @unique
+  claim           QuestClaim @relation(fields: [claimId], references: [id])
+  wallet          String
+  amountBaseUnits BigInt
+  txSignature     String?
+  createdAt       DateTime  @default(now())
+}
+
+// ──── Merchant Analytics ────
+model MerchantAnalytics {
+  id            String   @id @default(cuid())
+  merchantId    String
+  merchant      Merchant @relation(fields: [merchantId], references: [id])
+  date          DateTime @db.Date
+  visits        Int      @default(0)
+  transactions  Int      @default(0)
+  revenue       Float    @default(0)
+  rewardsIssued Float    @default(0)
+  uniqueUsers   Int      @default(0)
+
+  @@unique([merchantId, date])
+}
+
+// ──── Leaderboard ────
+model LeaderboardEntry {
+  id        String   @id @default(cuid())
+  wallet    String
+  xp        Int
+  rank      Int
+  period    String
+  updatedAt DateTime @updatedAt
+
+  @@unique([wallet, period])
+}

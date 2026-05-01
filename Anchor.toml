@@ -1,0 +1,24 @@
+[toolchain]
+anchor_version = "0.32.1"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+merchant_registry = "3GyfAzucGoL1FFpkhpCm3sRjTCjLxPyeFLp4vayw35GH"
+quest_program = "21qTx6xMKjy4v23BbfGvM1mSKvkk3bNVHvgSnXZEMcpC"
+
+[programs.devnet]
+merchant_registry = "3GyfAzucGoL1FFpkhpCm3sRjTCjLxPyeFLp4vayw35GH"
+quest_program = "21qTx6xMKjy4v23BbfGvM1mSKvkk3bNVHvgSnXZEMcpC"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "localnet"
+wallet = "./wallet/backend.json"
+
+[scripts]
+test = "node -e \"console.log('Legacy SOL reward program disabled for the PIKO-only demo flow')\""

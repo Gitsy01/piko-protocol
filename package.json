@@ -1,0 +1,39 @@
+{
+  "name": "depokemongo",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm@11.12.1",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "predev": "node scripts/kill-ports.mjs",
+    "dev": "turbo run dev --filter=web --filter=@depokemongo/server",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:server": "turbo run dev --filter=@depokemongo/server",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "db:push": "cd packages/server && npx prisma db push",
+    "db:seed": "npx tsx scripts/seed-merchants.ts",
+    "anchor:build": "node scripts/run-anchor.cjs build",
+    "anchor:test": "node scripts/run-anchor.cjs test",
+    "anchor:deploy": "node scripts/run-anchor.cjs deploy"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3",
+    "turbo": "^2.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "next": "^15.5.15"
+  },
+  "optionalDependencies": {
+    "@next/swc-win32-x64-msvc": "^15.5.15"
+  }
+}

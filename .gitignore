@@ -1,0 +1,13 @@
+node_modules/
+.next/
+dist/
+.turbo/
+.env
+.env.local
+*.log
+target/
+.anchor/
+test-ledger/
+wallet/*.json
+
+.fetch-coder/checkpoints/
