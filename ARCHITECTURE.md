@@ -4,6 +4,8 @@ PIKO Protocol enables businesses to program real-world incentives that execute o
 
 The current repository keeps the historical codebase name `DePokemonGo`, but the public-facing product narrative is now `PIKO Protocol`: location-based incentive infrastructure for merchants, events, communities, and real-world activation campaigns.
 
+At a glance, the protocol has four layers: a demo client that captures real-world actions, an API that verifies and orchestrates them, AI agents that score risk and adjust rewards, and Solana programs that settle the final result. The point of the stack is simple: real-world merchant engagement can be priced, filtered, and paid out on-chain without rebuilding separate product logic for every campaign.
+
 ## Protocol Stack
 
 ```text

@@ -27,7 +27,7 @@ export default function QuestIndexPage() {
         }
       } catch (loadError) {
         if (!cancelled) {
-          setError(loadError instanceof Error ? loadError.message : "Failed to load live quests");
+          setError(loadError instanceof Error ? loadError.message : "Failed to load live incentives");
           setQuests([]);
         }
       } finally {
@@ -48,10 +48,10 @@ export default function QuestIndexPage() {
     <div className="pageStack questPage">
       <section className="heroPanel walletHero glassShine">
         <div>
-          <p className="eyebrow" style={{ animation: "neonFlicker 3s infinite" }}>Live Quests</p>
-          <h1>Discover & Complete Missions</h1>
+          <p className="eyebrow" style={{ animation: "neonFlicker 3s infinite" }}>Live Incentives</p>
+          <h1>Discover and settle active incentive programs</h1>
           <p className="heroCopy">
-            Browse live backend quests near your current GPS position, then complete the Solana Pay reward loop.
+            Browse live backend incentives near your current GPS position, then complete the Solana Pay settlement loop.
           </p>
           <p className="supportText">
             {locationLabel}
@@ -61,7 +61,7 @@ export default function QuestIndexPage() {
         <div className="heroStats">
           <div className="statChip fancyHover">
             <span>{quests.length}</span>
-            <p>Active Quests</p>
+            <p>Active incentives</p>
           </div>
         </div>
       </section>
@@ -69,7 +69,7 @@ export default function QuestIndexPage() {
       {error ? (
         <section className="merchantMiniCard">
           <p className="eyebrow">Backend required</p>
-          <h2>Live quests unavailable</h2>
+          <h2>Live incentives unavailable</h2>
           <p className="supportText">{error}</p>
         </section>
       ) : null}
@@ -77,16 +77,16 @@ export default function QuestIndexPage() {
       {loading ? (
         <section className="merchantMiniCard">
           <p className="eyebrow">Loading</p>
-          <h2>Fetching nearby quests</h2>
-          <p className="supportText">Reading active quests from the API.</p>
+          <h2>Fetching nearby incentives</h2>
+          <p className="supportText">Reading active incentive programs from the API.</p>
         </section>
       ) : null}
 
       {!loading && !error && quests.length === 0 ? (
         <section className="merchantMiniCard">
-          <p className="eyebrow">No nearby quests</p>
-          <h2>Create or seed a merchant quest near this location</h2>
-          <p className="supportText">The page no longer falls back to demo quests when the backend has no live data.</p>
+          <p className="eyebrow">No nearby incentives</p>
+          <h2>Create or seed a merchant incentive near this location</h2>
+          <p className="supportText">The page no longer falls back to demo incentives when the backend has no live data.</p>
         </section>
       ) : null}
 

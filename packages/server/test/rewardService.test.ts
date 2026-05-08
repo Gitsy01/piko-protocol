@@ -65,6 +65,15 @@ function createDb(options?: {
   latestRewardAt?: Date | null;
   existingClaimRewardTx?: string | null;
   existingTransactionRewardTx?: string | null;
+  lastRewardedClaim?: {
+    claimedAt: Date;
+    quest: {
+      merchant: {
+        lat: number;
+        lng: number;
+      };
+    };
+  } | null;
   ledgerAlreadyExists?: boolean;
   storedIntent?: {
     decision: "APPROVED" | "REJECTED";
@@ -140,6 +149,7 @@ function createDb(options?: {
       },
       questClaim: {
         findUnique: async () => ({ rewardTx: options?.existingClaimRewardTx ?? null }),
+        findFirst: async () => options?.lastRewardedClaim ?? null,
         update: async (payload: unknown) => {
           events.claimUpdates.push(payload);
           return payload;
@@ -236,6 +246,11 @@ test("settleReward mints PIKO after approval", async () => {
   assert.equal(result.rewardToken, "PIKO");
   assert.equal(result.rewardAmount, 12.5);
   assert.equal(result.rewardTx, "mint-signature");
+  assert.deepEqual(result.economicState, {
+    vaultBalance: 100,
+    budgetGuardActive: false,
+    effectiveMultiplierRange: "0.1× – 3.0×",
+  });
   assert.deepEqual(mintCalls, [
     {
       wallet: "7QpM4vTxD8fJ2kLmN5rS9wXaBcDeFgHiJkLmNoPqRsTu",
@@ -424,6 +439,46 @@ test("settleReward reuses a persisted settlement intent after a crash", async ()
   assert.equal(reviewCalls, 0);
   assert.equal(result.rewardMultiplier, 1.25);
   assert.equal(result.rewardAmountBaseUnits, "12500000000");
+});
+
+test("settleReward forwards impossible-travel context into the fraud review", async () => {
+  const db = createDb({
+    lastRewardedClaim: {
+      claimedAt: new Date(Date.now() - 2 * 60 * 1000),
+      quest: {
+        merchant: {
+          lat: 28.612,
+          lng: 77.208,
+        },
+      },
+    },
+  });
+  let receivedInput: Record<string, unknown> | null = null;
+
+  const service = new RewardService({
+    db: db.client as never,
+    agentCouncil: {
+      reviewClaim: async (input) => {
+        receivedInput = input as Record<string, unknown>;
+        return createReview(true, 1.25);
+      },
+    },
+    mintPikoFn: async () => "mint-signature",
+    findMintedPikoRewardTxFn: async () => null,
+    syncUserLeaderboardFn: async () => undefined,
+  });
+
+  await service.settleReward({
+    ...createSettlementInput({
+      lat: 28.6139,
+      lng: 77.209,
+    }),
+  });
+
+  assert.equal(receivedInput?.prevLat, 28.612);
+  assert.equal(receivedInput?.prevLng, 77.208);
+  assert.equal(typeof receivedInput?.timeDelta, "number");
+  assert.ok((receivedInput?.timeDelta as number) > 0);
 });
 
 test("settleReward recovers a chain mint instead of reminting", async () => {

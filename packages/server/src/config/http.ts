@@ -1,4 +1,5 @@
 import { ZodError, ZodSchema } from "zod";
+import { Response } from "express";
 
 export class HttpError extends Error {
   constructor(
@@ -44,4 +45,31 @@ export function getErrorStatus(error: unknown): number {
   }
 
   return error instanceof ZodError ? 400 : 500;
+}
+
+export function sendSuccess<T>(
+  res: Response,
+  data: T,
+  message = "Request completed",
+  status = 200
+) {
+  return res.status(status).json({
+    success: true,
+    message,
+    data,
+  });
+}
+
+export function sendError(
+  res: Response,
+  error: unknown,
+  fallback = "Request failed"
+) {
+  const message = getErrorMessage(error, fallback);
+  return res.status(getErrorStatus(error)).json({
+    success: false,
+    message,
+    error: message,
+    data: null,
+  });
 }

@@ -108,7 +108,7 @@ export class PaymentService {
       });
 
       if (!claim) {
-        throw new HttpError(400, "Create a pending quest claim before requesting payment");
+        throw new HttpError(400, "Create a pending incentive claim before requesting payment");
       }
     }
 

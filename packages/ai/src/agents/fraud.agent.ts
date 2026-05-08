@@ -51,7 +51,7 @@ export class FraudAgent extends BaseAgent<FraudInput, FraudOutput> {
 
     try {
       const prompt = [
-        "Assess the fraud risk for this quest claim.",
+        "Assess the fraud risk for this incentive claim.",
         "Keep the analysis strict and return compact JSON only.",
         `wallet: ${input.wallet}`,
         `merchantId: ${input.merchantId}`,

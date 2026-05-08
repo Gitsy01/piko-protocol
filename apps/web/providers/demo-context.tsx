@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useReducer, type PropsWithChildren } from "react";
-import { demoMerchants, demoQuests } from "@/lib/demo-data";
+import { demoPrimaryMerchant, demoPrimaryQuest } from "@/lib/demo-data";
+import type { DecisionReceiptData } from "@/lib/decision-receipt";
 import type { MerchantPinType, QuestDetail } from "@/lib/types";
 
 export type DemoStep = "discover" | "pay" | "evaluating" | "reward";
@@ -13,11 +14,20 @@ export type AIEvaluationData = {
   rewardReasons: string[];
   decision: "APPROVED" | "REJECTED";
   worldVerified: boolean;
+  paymentVerified: boolean;
+  paymentAmountSol: number;
+  locationDistanceMeters: number;
+  gpsAccuracyMeters: number;
+  impossibleTravelClear: boolean;
   aiSummary: string;
   originalReward: number;
   adjustedReward: number;
   adjustedRewardDisplay: string;
   rewardToken: string;
+  // Economic visibility
+  merchantBudget: number;          // PIKO remaining in merchant vault
+  dailyEmissionRemaining: number;  // Protocol-wide PIKO left today
+  budgetCapActive: boolean;        // true = multiplier was capped by budget guard
 };
 
 export type DemoRewardResult = {
@@ -39,6 +49,7 @@ export type DemoState = {
   verifyPending: boolean;
   rewardResult: DemoRewardResult | null;
   aiEvaluation: AIEvaluationData | null;
+  decisionReceipt: DecisionReceiptData | null;
 };
 
 type DemoAction =
@@ -50,13 +61,14 @@ type DemoAction =
       payload: {
         rewardResult: DemoRewardResult;
         aiEvaluation: AIEvaluationData;
+        decisionReceipt: DecisionReceiptData;
       };
     }
   | { type: "EVALUATION_DONE" }
   | { type: "RESET" };
 
-const DEFAULT_QUEST = demoQuests[0];
-const DEFAULT_MERCHANT = demoMerchants[0];
+const DEFAULT_QUEST = demoPrimaryQuest;
+const DEFAULT_MERCHANT = demoPrimaryMerchant;
 
 const initialState: DemoState = {
   step: "discover",
@@ -66,12 +78,13 @@ const initialState: DemoState = {
   verifyPending: false,
   rewardResult: null,
   aiEvaluation: null,
+  decisionReceipt: null,
 };
 
 function demoReducer(state: DemoState, action: DemoAction): DemoState {
   switch (action.type) {
     case "START_QUEST":
-      return { ...state, step: "pay", rewardResult: null, aiEvaluation: null };
+      return { ...state, step: "pay", rewardResult: null, aiEvaluation: null, decisionReceipt: null };
     case "VERIFY_START":
       return { ...state, verifyPending: true };
     case "VERIFY_COMPLETE":
@@ -86,6 +99,7 @@ function demoReducer(state: DemoState, action: DemoAction): DemoState {
         step: "evaluating",
         rewardResult: action.payload.rewardResult,
         aiEvaluation: action.payload.aiEvaluation,
+        decisionReceipt: action.payload.decisionReceipt,
       };
     case "EVALUATION_DONE":
       return { ...state, step: "reward" };

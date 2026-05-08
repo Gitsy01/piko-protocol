@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
+import { DemoKioskHome } from "@/components/demo-kiosk-home";
+import { useDemoMode } from "@/hooks/use-demo-mode";
 import { useMerchantMap } from "@/hooks/use-merchant-map";
 import { classifyPin, formatCountdownLabel, formatDistance, formatReward } from "@/lib/utils";
 import { MerchantPinType } from "@/lib/types";
@@ -32,6 +34,7 @@ function formatCoordinate(value: number) {
 }
 
 export default function HomePage() {
+  const demoMode = useDemoMode();
   const {
     merchants,
     heatmapData,
@@ -180,6 +183,10 @@ export default function HomePage() {
     []
   );
 
+  if (demoMode) {
+    return <DemoKioskHome />;
+  }
+
   return (
     <div className="pageStack mapPage">
       <section className="mapExperience">
@@ -202,7 +209,7 @@ export default function HomePage() {
                 <strong>{currentMerchants}</strong>
               </div>
               <div className="tickerChip fancyHover">
-                <span className="tickerLabel">Active quests</span>
+                <span className="tickerLabel">Active incentives</span>
                 <strong>{currentQuests}</strong>
               </div>
               <div className="tickerChip fancyHover">
@@ -229,7 +236,7 @@ export default function HomePage() {
               </button>
             ))}
             <span className="filterSummary">
-              {loading ? "Locating live district..." : `${deferredMerchants.length} live markers`}
+              {loading ? "Locating live merchants..." : `${deferredMerchants.length} live markers`}
             </span>
           </div>
 
@@ -280,8 +287,8 @@ export default function HomePage() {
 
             <div className="drawerHeader">
               <div>
-                <p className="eyebrow">Merchant discovery</p>
-                <h2>Scan the reward field</h2>
+                <p className="eyebrow">Merchant network</p>
+                <h2>Scan the live incentive field</h2>
               </div>
               <div className="drawerSnapButtons">
                 {SHEET_SNAP_POINTS.map((point) => (
@@ -291,7 +298,7 @@ export default function HomePage() {
                     onClick={() => setSheetHeight(point)}
                     type="button"
                   >
-                    {point === 38 ? "Peek" : point === 56 ? "Focus" : "Expand"}
+                {point === 38 ? "Peek" : point === 56 ? "Focus" : "Expand"}
                   </button>
                 ))}
               </div>
@@ -344,14 +351,14 @@ function MerchantSheet({ merchant }: { merchant: MerchantPinType }) {
             <div>
               <h3>{merchant.name}</h3>
               <p>
-                {merchant.category} in {merchant.district}
+                {merchant.category} · {merchant.district}
               </p>
             </div>
           </div>
           <div className="merchantChipRow">
             <span>{formatDistance(merchant.distance)}</span>
             <span>{merchant.rewardPool.toFixed(0)} PIKO pool</span>
-            <span>{merchant.hotspotScore} hotspot score</span>
+            <span>{merchant.hotspotScore} demand score</span>
           </div>
         </div>
       </div>
@@ -365,12 +372,12 @@ function MerchantSheet({ merchant }: { merchant: MerchantPinType }) {
         <div className="merchantInsightCard">
           <span className="metricLabel">Foot traffic</span>
           <strong>{merchant.totalVisits ?? 0}</strong>
-          <p>Check-ins in the last 24h</p>
+          <p>Verified visits in the last 24h</p>
         </div>
         <div className="merchantInsightCard">
-          <span className="metricLabel">Quest density</span>
+          <span className="metricLabel">Incentive density</span>
           <strong>{merchant.quests.length}</strong>
-          <p>Active reward loops right now</p>
+          <p>Active merchant-funded programs right now</p>
         </div>
       </div>
 

@@ -13,9 +13,9 @@ export function DemoWalletGate() {
             <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
           </svg>
         </div>
-        <h2 className="demoWalletGateTitle">Connect wallet to start earning</h2>
+        <h2 className="demoWalletGateTitle">Connect wallet to start the flow</h2>
         <p className="demoWalletGateSub">
-          Connect Phantom or Backpack to complete quests and earn PIKO on Solana.
+          Connect Phantom or Backpack to complete incentive flows and settle PIKO on Solana.
         </p>
         <div className="demoWalletGateAction">
           <WalletMultiButton />

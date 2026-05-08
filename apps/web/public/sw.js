@@ -1,5 +1,5 @@
-const STATIC_CACHE = "depokemongo-static-v4";
-const RUNTIME_CACHE = "depokemongo-runtime-v4";
+const STATIC_CACHE = "piko-protocol-static-v4";
+const RUNTIME_CACHE = "piko-protocol-runtime-v4";
 const STATIC_ASSETS = [
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
@@ -106,10 +106,10 @@ self.addEventListener("fetch", (event) => {
 
 self.addEventListener("message", (event) => {
   if (event.data?.type === "SHOW_NEARBY_REWARD") {
-    self.registration.showNotification("Nearby reward unlocked", {
+    self.registration.showNotification("Nearby incentive available", {
       body:
         event.data.body ||
-        "A premium quest just unlocked nearby. Open the map, claim the mission, and pay to earn instantly.",
+        "A verified merchant incentive is available nearby. Open the map, review the receipt path, and settle instantly.",
       icon: "/icons/icon-192.svg",
       badge: "/icons/icon-192.svg",
     });

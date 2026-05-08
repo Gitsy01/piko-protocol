@@ -17,7 +17,7 @@ quest_program = "21qTx6xMKjy4v23BbfGvM1mSKvkk3bNVHvgSnXZEMcpC"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "./wallet/backend.json"
 
 [scripts]

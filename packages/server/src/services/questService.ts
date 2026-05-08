@@ -6,8 +6,8 @@ import { prisma } from "../config/db";
 import { env } from "../config/env";
 import { HttpError } from "../config/http";
 import { PaymentService } from "./paymentService";
-import { RewardService, SettlementResult } from "./rewardService";
-import { mintRewardNFT } from "./nftService";
+import { buildEconomicState, RewardService, SettlementResult } from "./rewardService";
+import { mintRewardNFT, ProofNftMetadata } from "./nftService";
 
 export type CompleteQuestInput = {
   userWallet: string;
@@ -24,6 +24,7 @@ export type QuestCompletionResult = {
   txSignature: string | null;
   approved: boolean;
   worldVerified: boolean;
+  worldIdVerified: boolean;
   decision: "APPROVED" | "REJECTED";
   rewardToken: string;
   rewardAmountBaseUnits: string;
@@ -32,10 +33,15 @@ export type QuestCompletionResult = {
   rewardMultiplier: number;
   aiSummary: string;
   fraudScore: number;
+  fraudFlags: string[];
+  distanceMeters: number;
+  gpsAccuracy: number;
+  economicState: SettlementResult["economicState"];
   xpEarned: number;
   newLevel: number;
   transactionId: string;
   nftMint?: string | null;
+  nftMetadata?: ProofNftMetadata;
 };
 
 type CreateQuestPayload = {
@@ -108,7 +114,7 @@ export class QuestService {
     });
 
     if (!claim) {
-      throw new HttpError(400, "Create a pending quest claim before completing the quest");
+      throw new HttpError(400, "Create a pending incentive claim before completing the settlement");
     }
 
     const existingTransaction = await this.db.transaction.findUnique({
@@ -128,7 +134,7 @@ export class QuestService {
     }
 
     if (existingTransaction?.completedAt) {
-      return this.buildCompletionResultFromTransaction(existingTransaction);
+      return this.buildCompletionResultFromTransaction(existingTransaction, quest, input);
     }
 
     const verification = await this.paymentService.verifyTransactionFull(
@@ -213,7 +219,7 @@ export class QuestService {
     });
 
     if (transaction.completedAt) {
-      return this.buildCompletionResultFromTransaction(transaction);
+      return this.buildCompletionResultFromTransaction(transaction, quest, input);
     }
 
     const claimReservation = await this.db.questClaim.updateMany({
@@ -241,7 +247,7 @@ export class QuestService {
       });
 
       if (latestTransaction?.completedAt) {
-        return this.buildCompletionResultFromTransaction(latestTransaction);
+        return this.buildCompletionResultFromTransaction(latestTransaction, quest, input);
       }
 
       const freshClaim = await this.db.questClaim.findUnique({
@@ -260,6 +266,7 @@ export class QuestService {
     }
 
     let settlement: SettlementResult;
+    const distanceMeters = haversineDistance(input.lat ?? 0, input.lng ?? 0, quest.merchant.lat, quest.merchant.lng);
     try {
       settlement = await this.rewardService.settleReward({
         claimId: claim.id,
@@ -285,12 +292,21 @@ export class QuestService {
 
     let nftMint: string | null = null;
     let nftTxSignature: string | null = null;
+    let nftMetadata: ProofNftMetadata | undefined;
 
     if (settlement.approved && env.NFT_REWARDS_ENABLED) {
       try {
-        const nftResult = await this.mintRewardNftFn(input.userWallet, quest.title, quest.merchant.name);
+        const nftResult = await this.mintRewardNftFn(
+          input.userWallet,
+          quest.title,
+          quest.merchant.name,
+          settlement.fraudScore,
+          settlement.rewardMultiplier,
+          settlement.worldVerified,
+        );
         nftMint = nftResult.nftMint;
         nftTxSignature = nftResult.txSignature;
+        nftMetadata = nftResult.metadata;
 
         const user = await this.db.user.findUnique({
           where: { wallet: input.userWallet },
@@ -361,6 +377,7 @@ export class QuestService {
       txSignature: verification.signature,
       approved: settlement.approved,
       worldVerified: settlement.worldVerified,
+      worldIdVerified: settlement.worldVerified,
       decision: settlement.decision,
       rewardToken: settlement.rewardToken,
       rewardAmountBaseUnits: settlement.rewardAmountBaseUnits,
@@ -369,10 +386,15 @@ export class QuestService {
       rewardMultiplier: settlement.rewardMultiplier,
       aiSummary: settlement.aiSummary,
       fraudScore: settlement.fraudScore,
+      fraudFlags: settlement.fraudFlags,
+      distanceMeters,
+      gpsAccuracy: input.gpsAccuracy ?? 0,
+      economicState: settlement.economicState,
       xpEarned: settlement.xpEarned,
       newLevel: settlement.newLevel,
       transactionId: transaction.id,
       nftMint,
+      nftMetadata,
     };
   }
 
@@ -512,7 +534,11 @@ export class QuestService {
     };
   }
 
-  private buildCompletionResultFromTransaction(transaction: CompletionSnapshot): QuestCompletionResult {
+  private buildCompletionResultFromTransaction(
+    transaction: CompletionSnapshot,
+    quest: { merchant: { lat: number; lng: number; name: string } },
+    input: Pick<CompleteQuestInput, "lat" | "lng" | "gpsAccuracy">,
+  ): QuestCompletionResult {
     if (
       transaction.decision == null ||
       transaction.worldVerified == null ||
@@ -529,12 +555,23 @@ export class QuestService {
 
     const rewardAmountBaseUnits = transaction.rewardAmountBaseUnits.toString();
     const rewardAmountDisplay = formatPiko(transaction.rewardAmountBaseUnits, env.PIKO_DECIMALS);
+    const distanceMeters = haversineDistance(input.lat ?? 0, input.lng ?? 0, quest.merchant.lat, quest.merchant.lng);
+    const nftMetadata =
+      transaction.nftMint && transaction.decision === "APPROVED"
+        ? buildProofNftMetadata({
+            merchantName: quest.merchant.name,
+            fraudScore: transaction.fraudScore,
+            rewardMultiplier: transaction.rewardMultiplier,
+            worldVerified: transaction.worldVerified,
+          })
+        : undefined;
 
     return {
       verified: true,
       txSignature: transaction.txSignature,
       approved: transaction.decision === "APPROVED",
       worldVerified: transaction.worldVerified,
+      worldIdVerified: transaction.worldVerified,
       decision: transaction.decision as "APPROVED" | "REJECTED",
       rewardToken: transaction.rewardToken,
       rewardAmountBaseUnits,
@@ -543,10 +580,15 @@ export class QuestService {
       rewardMultiplier: transaction.rewardMultiplier,
       aiSummary: transaction.aiSummary,
       fraudScore: transaction.fraudScore,
+      fraudFlags: [],
+      distanceMeters,
+      gpsAccuracy: input.gpsAccuracy ?? 0,
+      economicState: buildEconomicState(100),
       xpEarned: transaction.xpEarned,
       newLevel: transaction.newLevel,
       transactionId: transaction.id,
       nftMint: transaction.nftMint,
+      nftMetadata,
     };
   }
 
@@ -593,4 +635,21 @@ export class QuestService {
       );
     }
   }
+}
+
+function buildProofNftMetadata(input: {
+  merchantName: string;
+  fraudScore: number;
+  rewardMultiplier: number;
+  worldVerified: boolean;
+}): ProofNftMetadata {
+  return {
+    fraud_score: String(input.fraudScore),
+    payment_verified: "true",
+    location_verified: "true",
+    reward_multiplier: String(input.rewardMultiplier),
+    merchant: input.merchantName,
+    visit_date: new Date().toISOString().split("T")[0],
+    world_id_verified: String(input.worldVerified),
+  };
 }

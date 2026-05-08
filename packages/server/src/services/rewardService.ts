@@ -42,10 +42,17 @@ export type SettlementResult = {
   aiSummary: string;
   xpEarned: number;
   newLevel: number;
+  economicState: EconomicState;
 };
 
 type PreparedSettlement = Omit<SettlementResult, "rewardTx"> & {
   rewardAmountBaseUnitsBigInt: bigint;
+};
+
+export type EconomicState = {
+  vaultBalance: number;
+  budgetGuardActive: boolean;
+  effectiveMultiplierRange: string;
 };
 
 type StoredSettlementIntent = {
@@ -145,6 +152,7 @@ export class RewardService {
         aiSummary: preparedSettlement.aiSummary,
         xpEarned: preparedSettlement.xpEarned,
         newLevel: preparedSettlement.newLevel,
+        economicState: preparedSettlement.economicState,
       };
     }
 
@@ -183,6 +191,7 @@ export class RewardService {
         aiSummary: preparedSettlement.aiSummary,
         xpEarned: preparedSettlement.xpEarned,
         newLevel: updatedUser.level,
+        economicState: preparedSettlement.economicState,
       };
     }
 
@@ -236,6 +245,7 @@ export class RewardService {
         aiSummary: preparedSettlement.aiSummary,
         xpEarned: preparedSettlement.xpEarned,
         newLevel: updatedUser.level,
+        economicState: preparedSettlement.economicState,
       };
     } catch (error) {
       await this.db.quest.update({
@@ -284,10 +294,28 @@ export class RewardService {
     }
 
     const worldVerified = Boolean((input.user as { worldVerified?: boolean } | null)?.worldVerified);
+    const merchantBalance = 100;
+
+    // Provide prior rewarded-claim coordinates so the fraud layer can detect impossible travel.
+    const lastClaim = await this.db.questClaim.findFirst({
+      where: { userWallet: input.wallet, status: "REWARDED" },
+      orderBy: { claimedAt: "desc" },
+      include: { quest: { include: { merchant: true } } },
+    });
+
+    const prevLat = lastClaim?.quest.merchant.lat ?? undefined;
+    const prevLng = lastClaim?.quest.merchant.lng ?? undefined;
+    const timeDelta = lastClaim
+      ? (Date.now() - lastClaim.claimedAt.getTime()) / 1000
+      : undefined;
+
     const review = await this.agentCouncil.reviewClaim({
       wallet: input.wallet,
       lat: input.lat ?? 0,
       lng: input.lng ?? 0,
+      prevLat,
+      prevLng,
+      timeDelta,
       gpsAccuracy: input.gpsAccuracy,
       recentClaims: input.recentClaims,
       walletClaimsToday: input.walletClaimsToday,
@@ -298,7 +326,7 @@ export class RewardService {
       timeOfDay: this.getHourBucket(),
       dayOfWeek: this.getDayBucket(),
       userLevel: input.user?.level ?? 1,
-      merchantBalance: 100,
+      merchantBalance,
       worldVerified,
     } as never);
 
@@ -312,6 +340,7 @@ export class RewardService {
     const rewardAmountDisplay = formatPiko(rewardAmountBaseUnitsBigInt, env.PIKO_DECIMALS);
     const rewardAmount = baseUnitsToNumber(rewardAmountBaseUnitsBigInt, env.PIKO_DECIMALS);
     const aiSummary = this.buildAiSummary(review.reward.reasoning, review.fraud.reasoning);
+    const economicState = buildEconomicState(merchantBalance);
     const preparedSettlement: PreparedSettlement = {
       approved: review.approved,
       worldVerified,
@@ -330,6 +359,7 @@ export class RewardService {
       newLevel: review.approved
         ? xpToLevel((input.user?.xp ?? 0) + input.quest.xpReward)
         : input.user?.level ?? 1,
+      economicState,
     };
 
     await this.db.transaction.update({
@@ -388,6 +418,7 @@ export class RewardService {
       aiSummary: storedIntent.aiSummary,
       xpEarned: storedIntent.xpEarned,
       newLevel: storedIntent.newLevel,
+      economicState: buildEconomicState(100),
     };
   }
 
@@ -618,4 +649,13 @@ function normalizeReasonList(value: Prisma.JsonValue | null): string[] {
   }
 
   return value.filter((item): item is string => typeof item === "string");
+}
+
+export function buildEconomicState(merchantBalance: number): EconomicState {
+  return {
+    vaultBalance: merchantBalance,
+    budgetGuardActive: merchantBalance < 25,
+    effectiveMultiplierRange:
+      merchantBalance < 10 ? "0.1× – 0.75×" : merchantBalance < 25 ? "0.1× – 1.2×" : "0.1× – 3.0×",
+  };
 }

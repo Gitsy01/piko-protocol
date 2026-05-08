@@ -2,18 +2,18 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "DePokemonGo",
-    short_name: "DePokemonGo",
-    description: "Premium cyberpunk merchant quests and Solana rewards in a mobile-first PWA.",
+    name: "PIKO Protocol",
+    short_name: "PIKO",
+    description: "Real-world programmable incentives with visible verification and on-chain settlement.",
     start_url: "/",
     display: "standalone",
     background_color: "#05050b",
     theme_color: "#0a0a12",
     orientation: "portrait",
-    categories: ["finance", "games", "lifestyle"],
+    categories: ["finance", "business", "productivity"],
     shortcuts: [
       { name: "Open Map", short_name: "Map", url: "/" },
-      { name: "Open Quests", short_name: "Quests", url: "/quest/quest-bloom" },
+      { name: "Open Incentives", short_name: "Incentives", url: "/quest/quest-bloom" },
       { name: "Open Wallet", short_name: "Wallet", url: "/wallet" },
     ],
     icons: [

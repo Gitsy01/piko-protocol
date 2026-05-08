@@ -3,10 +3,10 @@
 import { useDemoContext } from "@/providers/demo-context";
 
 const STEPS = [
-  { key: "discover", label: "Discover" },
-  { key: "pay", label: "Verify & Pay" },
-  { key: "evaluating", label: "AI Evaluates" },
-  { key: "reward", label: "Reward" },
+  { key: "discover", label: "Tap Pin" },
+  { key: "pay", label: "Claim & Pay" },
+  { key: "evaluating", label: "AI Verify" },
+  { key: "reward", label: "Get Reward" },
 ] as const;
 
 export function DemoStepper() {
@@ -35,9 +35,9 @@ export function DemoStepper() {
               )}
             </div>
             <span className="demoStepLabel">{step.label}</span>
-            {index < STEPS.length - 1 && (
+            {index < STEPS.length - 1 ? (
               <div className={`demoStepConnector ${isDone ? "done" : ""}`} aria-hidden="true" />
-            )}
+            ) : null}
           </div>
         );
       })}

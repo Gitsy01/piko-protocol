@@ -1,9 +1,11 @@
 import Redis from "ioredis";
 import { configureAgentCache, type AgentDecision } from "@depokemongo/ai";
 import { env } from "./env";
+import { log } from "./logger";
 
 class RedisAgentCache {
   private readonly client: Redis;
+  private hasLoggedConnectionIssue = false;
 
   constructor(url: string) {
     this.client = new Redis(url, {
@@ -12,7 +14,12 @@ class RedisAgentCache {
     });
 
     this.client.on("error", (error) => {
-      console.warn("[AI Cache] Redis unavailable, continuing without cache", error.message);
+      if (this.hasLoggedConnectionIssue) {
+        return;
+      }
+
+      this.hasLoggedConnectionIssue = true;
+      log("info", "[AI Cache] Redis unavailable, continuing without cache", error.message);
     });
   }
 

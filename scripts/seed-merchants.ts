@@ -69,7 +69,7 @@ async function main() {
       create: {
         wallet: makeWallet(index),
         name,
-        description: `Demo merchant for DePokemonGo seed set #${index + 1}`,
+        description: `Demo merchant for PIKO Protocol seed set #${index + 1}`,
         category,
         lat: coords.lat,
         lng: coords.lng,

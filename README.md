@@ -1,60 +1,93 @@
-# PIKO Protocol - Location-Based Incentive Infrastructure on Solana
+# PIKO Protocol
 
-PIKO Protocol enables businesses to program real-world incentives that execute on-chain using location verification and AI validation. This repository combines Solana programs, an incentive API, an AI validation engine, and a mobile-first demo client that showcases the protocol end to end.
+Earn rewards for real-world actions instantly on-chain.
 
-The repository name remains `DePokemonGo` for code continuity, but the public-facing product narrative is now `PIKO Protocol`.
+## Colosseum Positioning
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for the full 4-layer protocol walkthrough.
+For the Solana Frontier x Metaplex submission story, lead with three ideas:
 
-## Protocol stack
+- Anti-cheat moat: identity, payment, GPS, AI scoring, and economic guardrails
+- Economic control: merchant-funded reward logic with budget-aware pricing
+- Metaplex proofs: each verified visit becomes a composable on-chain proof
 
-- `Layer 1 - Solana Protocol`
-  `programs/merchant-registry` stores merchant identity, staking, and registry state.
-- `Layer 1 - Solana Protocol`
-  `programs/quest` stores incentive trigger and claim state on-chain.
-- `Layer 2 - AI Validation Engine`
-  `packages/ai` contains merchant vetting, fraud detection, reward optimization, and growth intelligence agents.
-- `Layer 3 - Incentive API`
-  `packages/server` provides merchant registration, incentive trigger creation, payment verification, AI endpoints, leaderboard data, and user routes.
-- `Layer 4 - Demo Client`
-  `apps/web` is a Next.js PWA for business discovery, incentive flows, wallet UX, and protocol demos.
-- `Shared Infrastructure`
-  `packages/common` contains shared types, constants, and utilities used across packages.
-- `Testing and Tooling`
-  `tests` contains Anchor and integration-style coverage, and `scripts` contains seeding plus Anchor helper scripts.
+Full strategy: [COLOSSEUM_STRATEGY.md](./COLOSSEUM_STRATEGY.md)
 
-## Tech stack
+## Demo in 10 Seconds
 
-- Turborepo workspaces
-- Next.js 14 and React 18
-- Express and Prisma
-- Solana Web3, Solana Pay, and Anchor
-- PostgreSQL and Redis
-- TypeScript across the monorepo
-- OpenRouter-backed AI integration for live model responses
-- Optional Ollama integration for local AI experiments
+1. Open the map
+2. Tap the merchant pin
+3. Confirm the payment
+4. AI verifies it
+5. 5 PIKO settles instantly
 
-## Prerequisites
+Some internal repo paths still use the legacy name for continuity, but every public-facing surface should present `PIKO Protocol`.
 
-Before running the project locally, make sure you have:
+## Run the Demo
 
-- Node.js 18 or newer
-- npm
+```bash
+npm install
+npm run dev
+```
+
+Open these exact URLs:
+
+- Main judge flow: `http://localhost:3000/?demo=1`
+- Focused reward loop: `http://localhost:3000/demo-flow?demo=1`
+- Merchant simulation: `http://localhost:3000/merchant/cafe-bloom`
+- System reveal console: `http://localhost:3000/demo`
+
+If you only have time for one flow, use `http://localhost:3000/?demo=1`.
+
+## What Judges Should Experience
+
+`/?demo=1` is now the forced path:
+
+1. See one merchant pin: **Cafe Bloom** (third-wave coffee · Connaught Place · 500 PIKO/day budget)
+2. Tap it
+3. Start the incentive flow — or tap **View full merchant profile** to see the economics dashboard
+4. Confirm the scripted payment
+5. See a structured anti-cheat decision receipt with fraud score, payment proof, location proof, and final reward
+6. See `5 PIKO` and the NFT proof appear
+
+## Why This Matters
+
+PIKO turns a real-world merchant action into a programmable on-chain incentive loop:
+
+- Discover a merchant on the map
+- Complete the action
+- Let AI verify fraud risk and reward logic
+- Settle the reward on Solana
+- Mint proof of completion
+
+## Architecture
+
+The architecture is already separated cleanly:
+
+- `programs/` - Solana programs for registry and incentive state
+- `packages/ai` - fraud scoring, reward optimization, merchant intelligence
+- `packages/server` - API layer for merchants, incentives, payments, AI, and rewards
+- `apps/web` - mobile-first demo client and judge-facing flows
+- `packages/common` - shared types and utilities
+
+Full breakdown: [ARCHITECTURE.md](./ARCHITECTURE.md)
+
+## Quick Start
+
+Prerequisites:
+
+- Node.js 18+
 - PostgreSQL
 - Redis
 - Rust toolchain
 - Solana CLI
 - Anchor CLI
-- A funded Solana devnet wallet for server/NFT operations plus a separate mint-authority wallet for live PIKO rewards
-- OpenRouter API key for live AI-backed reward and fraud decisions
-- Ollama if you want to keep local AI experiments available
 
-## Environment setup
+Environment:
 
-1. Copy `.env.example` to `.env`.
-2. Fill in the required values.
+1. Copy `.env.example` to `.env`
+2. Fill in the required values
 
-Important variables include:
+Important variables:
 
 - `DATABASE_URL`
 - `REDIS_URL`
@@ -72,84 +105,67 @@ Important variables include:
 - `OLLAMA_URL`
 - `OLLAMA_MODEL`
 - `NEXT_PUBLIC_API_URL`
+- `NEXT_PUBLIC_DEMO_MODE`
 - `JWT_SECRET`
+- `LOG_LEVEL`
 - `PORT`
 
-The default config is set up for Solana devnet.
-
-For dynamic PIKO rewards, keep `PIKO_MINT_AUTHORITY_WALLET` separate from `ANCHOR_WALLET`. In production, the mint-authority file should live outside the repository and be mounted or injected at deploy time.
-
-The web map uses free OpenStreetMap-backed CARTO tiles and does not require a map token.
-
-## Installation
-
-```bash
-npm install
-```
-
-## Quick start
-
-Run the web app and API in development mode:
-
-```bash
-npm run dev
-```
-
-Useful focused commands:
-
-```bash
-npm run dev:web
-npm run dev:server
-```
-
-Prepare the database:
+Database and local services:
 
 ```bash
 npm run db:push
 npm run db:seed
 ```
 
-Build or test the Anchor programs:
+Anchor:
 
 ```bash
 npm run anchor:build
 npm run anchor:test
 ```
 
-## Available scripts
+Deployment verification:
+
+```bash
+npm install
+npm run build
+npm run lint
+npm run test
+npm run anchor:build
+```
+
+Before any judge demo, keep `Anchor.toml` on devnet and verify the app still degrades cleanly when Redis, AI inference, NFT minting, RPC confirmation, or wallet connection is unavailable. `/?demo=1` should remain a controlled simulation with selective real primitives, not a dependency on live geolocation, payment latency, or fresh merchant data.
+
+## Scripts
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Run workspace development tasks through Turbo |
-| `npm run dev:web` | Start only the Next.js app |
-| `npm run dev:server` | Start only the Express API |
+| `npm run dev` | Run web app and server through Turbo |
+| `npm run dev:web` | Run only the Next.js app |
+| `npm run dev:server` | Run only the Express API |
 | `npm run build` | Build all workspaces |
 | `npm run lint` | Run workspace lint tasks |
 | `npm run test` | Run workspace tests |
-| `npm run db:push` | Push Prisma schema to the database |
+| `npm run db:push` | Push Prisma schema |
 | `npm run db:seed` | Seed merchant data |
 | `npm run anchor:build` | Build Anchor programs |
 | `npm run anchor:test` | Run Anchor tests |
 | `npm run anchor:deploy` | Deploy Anchor programs |
 
-## Development notes
+## Development Notes
 
-- The frontend runs on `http://localhost:3000`.
-- The API defaults to `http://localhost:3001`.
-- Health check endpoint: `GET /api/health`
-- WebSocket support is initialized by the server for realtime updates.
-- Generated artifacts under `target/` come from Anchor builds and deployments.
+- Frontend: `http://localhost:3000`
+- API: `http://localhost:3001`
+- Demo mode: `/?demo=1`
+- Focused scripted flow: `/demo-flow?demo=1`
+- Merchant simulation: `/merchant/cafe-bloom`
+- System reveal: `/demo`
+- Health check: `GET /api/health`
 
-## Suggested first run flow
+## Project Status
 
-1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env` and fill in local values.
-3. Start PostgreSQL and Redis.
-4. Run `npm run db:push`.
-5. Run `npm run db:seed`.
-6. Run `npm run anchor:build`.
-7. Start the app with `npm run dev`.
+This repo already has the full loop:
 
-## Project status
+`discover -> claim -> AI verify -> reward -> NFT`
 
-This repository is structured as an active monorepo for web, backend, AI, and Solana program development. If you are onboarding a new teammate, start with the web app and server packages first, then move to the Anchor programs once local services are running.
+The main work now is presentation, clarity, and demo quality, not core architecture.

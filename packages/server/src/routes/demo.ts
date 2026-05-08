@@ -118,7 +118,7 @@ function requireDemoAccess(req: Request) {
   }
 
   if (readDemoKey(req) !== expectedKey) {
-    throw new HttpError(403, "Demo key required. Open /demo?key=your-secret to unlock the live protocol route.");
+    throw new HttpError(403, "Demo key required. Open /demo?key=your-secret to access the live protocol route.");
   }
 }
 
@@ -786,6 +786,7 @@ demoRouter.post("/settle", async (req, res) => {
     let nftMode: DemoCapability["mode"] = capabilities.nft.mode;
     let nftMint: string | null = null;
     let nftTxSignature: string | null = null;
+    let nftMetadata: Awaited<ReturnType<typeof mintRewardNFT>>["metadata"] | undefined;
 
     if (settlement.approved) {
       if (!capabilities.nft.live) {
@@ -793,10 +794,18 @@ demoRouter.post("/settle", async (req, res) => {
         nftMint = `simulated-nft-${makeId("badge")}`;
       } else {
         try {
-          const nftResult = await mintRewardNFT(input.wallet, quest.title, quest.merchant.name);
+          const nftResult = await mintRewardNFT(
+            input.wallet,
+            quest.title,
+            quest.merchant.name,
+            settlement.fraudScore,
+            settlement.rewardMultiplier,
+            settlement.worldVerified,
+          );
           nftMode = "live";
           nftMint = nftResult.nftMint;
           nftTxSignature = nftResult.txSignature;
+          nftMetadata = nftResult.metadata;
         } catch (error) {
           nftMode = "simulated";
           nftMint = `simulated-nft-${makeId("badge")}`;
@@ -856,6 +865,7 @@ demoRouter.post("/settle", async (req, res) => {
           rewardTxMode: rewardMode,
           explorerUrl: resolveExplorerUrl(settlement.rewardTx, rewardMode),
           nftMint,
+          nftMetadata,
           nftMode,
           nftExplorerUrl: resolveAccountExplorerUrl(nftMint, nftMode),
           txSignature: settlement.rewardTx,

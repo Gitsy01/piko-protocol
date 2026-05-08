@@ -1,4 +1,4 @@
-# Brand - DePokemonGo
+# Brand - PIKO Protocol
 
 _Status: deferred_
 

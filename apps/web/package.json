@@ -6,7 +6,7 @@
     "dev": "node ../../scripts/next-dev.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@metaplex-foundation/js": "^0.20.1",

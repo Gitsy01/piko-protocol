@@ -27,9 +27,9 @@ export default function LeaderboardPage() {
       <section className="heroPanel leaderboardHero">
         <div>
           <p className="eyebrow">Leaderboard</p>
-          <h1>XP races, podium energy, and live rank pressure.</h1>
+          <h1>Protocol rankings and live merchant network momentum.</h1>
           <p className="heroCopy">
-            Weekly, monthly, and all-time ladders all feed the same loop: route smarter, complete quests faster, and turn streaks into leaderboard momentum.
+            Weekly, monthly, and all-time rankings show who is executing the most verified real-world incentive activity.
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export default function LeaderboardPage() {
 
       <LeaderboardWidget
         entries={entries}
-        title={`${period === "alltime" ? "All-time" : period.charAt(0).toUpperCase() + period.slice(1)} XP race`}
+        title={`${period === "alltime" ? "All-time" : period.charAt(0).toUpperCase() + period.slice(1)} protocol rankings`}
         highlightWallet="Demo...User"
       />
     </div>

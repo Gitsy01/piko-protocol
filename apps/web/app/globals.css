@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   DePokemonGo — Dark Cyberpunk Design System
+   PIKO Protocol design system
    ═══════════════════════════════════════════════════════════════ */
 
 /* --- Tokens --- */
@@ -518,6 +518,7 @@ h1, h2, h3 {
   align-items: center;
   gap: 6px;
   padding: 7px 14px;
+  min-height: 44px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--glass-border);
   background: transparent;
@@ -805,7 +806,11 @@ h1, h2, h3 {
    BUTTONS
    ═══════════════════════════════════════════════════════════════ */
 .ghostButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 16px;
+  min-height: 44px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--glass-border);
   background: transparent;
@@ -840,6 +845,7 @@ h1, h2, h3 {
   justify-content: center;
   gap: 8px;
   padding: 12px 24px;
+  min-height: 44px;
   border-radius: var(--radius-pill);
   border: none;
   background: linear-gradient(135deg, var(--brand), var(--solana-purple));
@@ -1333,6 +1339,9 @@ h1, h2, h3 {
 .badgeCard {
   position: relative;
   overflow: hidden;
+  display: grid;
+  align-content: start;
+  gap: 8px;
   transition: all 0.25s;
 }
 
@@ -1346,14 +1355,29 @@ h1, h2, h3 {
   height: 52px;
   border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--gold), var(--brand));
-  margin-bottom: 10px;
   display: grid;
   place-items: center;
-  font-size: 1.4rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.badgeCard h3 { font-size: 0.95rem; margin-bottom: 4px; }
-.badgeCard p { font-size: 0.82rem; color: var(--ink-muted); line-height: 1.4; }
+.badgeCard h3 {
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.badgeCard p {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  line-height: 1.4;
+  margin: 0;
+}
 
 /* Activity timeline */
 .activityList { display: grid; gap: 8px; margin-top: 12px; }
@@ -1486,13 +1510,234 @@ h1, h2, h3 {
   background: linear-gradient(135deg, var(--solana-purple), #7c3aed) !important;
   border-radius: var(--radius-pill) !important;
   font-family: var(--font-body), sans-serif !important;
-  height: 38px !important;
+  min-height: 44px !important;
   font-size: 0.82rem !important;
 }
 
 .wallet-adapter-modal-wrapper {
   background: var(--surface-strong) !important;
   border-radius: var(--radius-xl) !important;
+  max-height: calc(100dvh - 24px) !important;
+  overflow-y: auto !important;
+}
+
+.demoModeBadge {
+  cursor: default;
+  color: var(--solana-green);
+  border-color: rgba(20, 241, 149, 0.2);
+  background: rgba(20, 241, 149, 0.08);
+}
+
+.walletButtonPlaceholder {
+  width: 148px;
+  min-height: 44px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+}
+
+.demoKioskPage {
+  gap: 20px;
+}
+
+.demoKioskHero,
+.demoKioskMapCard,
+.demoKioskQuestCard,
+.aiSummaryPanel {
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+}
+
+.demoKioskHero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 28px 24px;
+  border-radius: var(--radius-xl);
+}
+
+.demoKioskCopy {
+  max-width: 60ch;
+}
+
+.demoKioskFlow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.demoKioskFlowStep {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.demoKioskFlowStep span {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 107, 44, 0.14);
+  color: var(--brand);
+  font-weight: 700;
+}
+
+.demoKioskFlowStep strong {
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.demoKioskStats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.demoKioskLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.7fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.demoKioskMapCard,
+.demoKioskQuestCard,
+.aiSummaryPanel {
+  padding: 20px;
+  border-radius: var(--radius-xl);
+}
+
+.demoKioskMapHeader,
+.aiSummaryHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.demoKioskMapShell {
+  position: relative;
+  min-height: 480px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.demoKioskMapShell .mapShell,
+.demoKioskMapShell .mapCanvas,
+.demoKioskMapShell .mapFallback {
+  min-height: 480px;
+  height: 480px;
+  border-radius: var(--radius-lg);
+}
+
+.demoKioskQuestCard {
+  display: grid;
+  gap: 16px;
+}
+
+.demoKioskMeta {
+  display: grid;
+  gap: 10px;
+}
+
+.demoKioskMetaRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.demoKioskHint {
+  line-height: 1.55;
+}
+
+.demoKioskCta {
+  width: 100%;
+}
+
+.demoKioskEmpty,
+.aiSummaryEmpty {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aiSummaryDecisionBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.aiSummaryDecisionBadge.approved {
+  color: var(--solana-green);
+  background: rgba(20, 241, 149, 0.08);
+  border: 1px solid rgba(20, 241, 149, 0.2);
+}
+
+.aiSummaryDecisionBadge.rejected {
+  color: #ff8a8a;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.aiSummaryGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.aiSummaryMetric {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aiSummaryMetric strong {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.2rem;
+}
+
+.aiSummaryTier.low {
+  color: var(--solana-green);
+}
+
+.aiSummaryTier.medium {
+  color: #f59e0b;
+}
+
+.aiSummaryTier.high {
+  color: #ff8a8a;
+}
+
+.aiSummaryReason strong {
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1519,6 +1764,27 @@ h1, h2, h3 {
   }
 
   .mapWrapper { min-height: 55vh; }
+
+  .demoKioskHero {
+    flex-direction: column;
+    padding: 22px 18px;
+  }
+
+  .demoKioskFlow {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .demoKioskLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .demoKioskMapShell,
+  .demoKioskMapShell .mapShell,
+  .demoKioskMapShell .mapCanvas,
+  .demoKioskMapShell .mapFallback {
+    min-height: 360px;
+    height: 360px;
+  }
 
   .twoColumnLayout {
     grid-template-columns: 1fr;
@@ -2606,7 +2872,8 @@ h1, h2, h3 {
 
 .premiumBadgeCard small {
   display: block;
-  margin-top: 12px;
+  margin-top: auto;
+  padding-top: 8px;
   color: var(--ink-dim);
   font-size: 0.78rem;
 }
@@ -2888,20 +3155,23 @@ h1, h2, h3 {
   width: 100%;
   min-height: 52px;
   display: grid;
-  grid-template-columns: 12px minmax(0, 1fr);
-  gap: 12px;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
   align-items: start;
-  padding: 14px;
+  padding: 14px 14px 14px 16px;
   border-radius: var(--radius-md);
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.02);
   color: var(--ink);
   text-align: left;
+  position: relative;
+  overflow: hidden;
   transition:
     border-color 150ms ease-out,
     transform 150ms ease-out,
     background-color 150ms ease-out,
-    color 150ms ease-out;
+    color 150ms ease-out,
+    box-shadow 150ms ease-out;
 }
 
 .demoStepButton span {
@@ -2910,12 +3180,15 @@ h1, h2, h3 {
 
 .demoStepButton strong {
   font-size: 0.92rem;
+  line-height: 1.25;
+  display: block;
 }
 
 .demoStepButton span span {
   margin-top: 4px;
   color: var(--ink-muted);
   font-size: 0.78rem;
+  line-height: 1.25;
 }
 
 .demoStepButton:hover:not(:disabled) {
@@ -2939,8 +3212,18 @@ h1, h2, h3 {
 }
 
 .demoStepButton.active {
-  border-color: rgba(255, 107, 44, 0.5);
-  background: rgba(255, 107, 44, 0.1);
+  border-color: rgba(255, 107, 44, 0.65);
+  background: linear-gradient(135deg, rgba(255, 107, 44, 0.16), rgba(255, 107, 44, 0.06));
+  box-shadow: 0 0 0 1px rgba(255, 107, 44, 0.28), 0 10px 24px rgba(255, 107, 44, 0.12);
+}
+
+.demoStepButton.active::before {
+  content: "";
+  position: absolute;
+  inset: 10px auto 10px 0;
+  width: 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ff9f5b, var(--brand));
 }
 
 .demoStepButton.done {
@@ -2948,17 +3231,17 @@ h1, h2, h3 {
 }
 
 .demoStepDot {
-  width: 12px;
-  height: 12px;
-  margin-top: 4px;
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.14);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
 }
 
 .demoStepButton.active .demoStepDot {
   background: var(--brand);
-  box-shadow: 0 0 18px rgba(255, 107, 44, 0.45);
+  box-shadow: 0 0 14px rgba(255, 107, 44, 0.35);
 }
 
 .demoStepButton.done .demoStepDot {
@@ -3739,6 +4022,14 @@ h1, h2, h3 {
   gap: 12px;
 }
 
+.demoQuestStory {
+  margin-top: 18px;
+}
+
+.demoQuestStory h3 {
+  font-size: 1.15rem;
+}
+
 .demoQuestMerchantAvatar {
   width: 48px;
   height: 48px;
@@ -3820,6 +4111,27 @@ h1, h2, h3 {
   line-height: 1.5;
 }
 
+.demoMerchantProfileLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.demoMerchantProfileLink:hover {
+  color: var(--brand);
+  border-color: rgba(255,107,44,0.25);
+  background: rgba(255,107,44,0.04);
+}
+
 /* --- Demo Pay Panel --- */
 .demoPayPanel {
   position: relative;
@@ -3846,6 +4158,11 @@ h1, h2, h3 {
   z-index: -1;
 }
 
+.demoPayIntro {
+  display: grid;
+  gap: 6px;
+}
+
 .demoPayFlow { display: flex; flex-direction: column; gap: 0; }
 
 .demoPayStep {
@@ -3856,10 +4173,25 @@ h1, h2, h3 {
   font-size: 0.9rem;
   color: var(--ink-muted);
   border-bottom: 1px solid var(--glass-border);
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  cursor: pointer;
 }
 
 .demoPayStep:last-child { border-bottom: none; }
 .demoPayStep strong { color: var(--ink); }
+.demoPayStep.active {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.03);
+}
+.demoPayStep:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
 
 .demoPayStepNum {
   width: 28px;
@@ -4560,6 +4892,26 @@ h1, h2, h3 {
   margin-bottom: 28px;
 }
 
+.demoRewardMoment {
+  display: grid;
+  gap: 6px;
+  max-width: 34rem;
+  margin: 0 auto 20px;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(20, 241, 149, 0.18);
+  background: rgba(20, 241, 149, 0.06);
+}
+
+.demoRewardMoment strong {
+  font-size: 1rem;
+}
+
+.demoRewardMoment span {
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
 .aiApprovalIcon {
   font-size: 2.5rem;
   animation: aiPopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
@@ -4636,6 +4988,185 @@ h1, h2, h3 {
 }
 
 .aiApprovalCheck.passed {
+  color: var(--ink);
+}
+
+/* Decision receipt */
+.aiDecisionReceipt {
+  max-width: 440px;
+  margin: 0 auto 20px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background: rgba(7, 10, 18, 0.72);
+  border: 1px solid rgba(20, 241, 149, 0.18);
+  text-align: left;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+}
+
+.aiDecisionReceipt.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.aiDecisionReceiptHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.aiDecisionReceiptHeader h3 {
+  font-size: 1rem;
+  margin-top: 2px;
+}
+
+.aiDecisionReceiptBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.aiDecisionReceiptBadge.approved {
+  color: var(--solana-green);
+  background: rgba(20, 241, 149, 0.1);
+  border: 1px solid rgba(20, 241, 149, 0.2);
+}
+
+.aiDecisionReceiptBadge.rejected {
+  color: #ff6b6b;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.aiDecisionReceiptGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.aiDecisionReceiptMetric {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aiDecisionReceiptLabel {
+  font-size: 0.76rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.aiDecisionReceiptMetric strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.aiDecisionReceiptMetric strong.low {
+  color: var(--solana-green);
+}
+
+.aiDecisionReceiptMetric strong.medium {
+  color: #f59e0b;
+}
+
+.aiDecisionReceiptMetric strong.high {
+  color: #ff6b6b;
+}
+
+.aiDecisionReceiptSubtext {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+/* ── Budget metric in 4-col receipt grid ── */
+.aiDecisionReceiptGrid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.aiDecisionReceiptBudget {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+}
+
+.aiDecisionReceiptBudget.ok  { color: var(--solana-green); }
+.aiDecisionReceiptBudget.warn { color: #f59e0b; }
+
+/* ── Economic summary row (below metric grid) ── */
+.aiDecisionEconomicRow {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(20, 241, 149, 0.04);
+  border: 1px solid rgba(20, 241, 149, 0.1);
+  animation: fadeInUp 0.3s ease-out both;
+}
+
+.aiDecisionEconomicStat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.aiDecisionEconomicValue {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.92rem;
+  color: var(--solana-green);
+}
+
+/* ── Budget cap warning banner (reward screen) ── */
+.aiDecisionBudgetCapBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f59e0b;
+  animation: fadeInUp 0.3s ease-out both;
+}
+
+.aiDecisionReceiptSignals {
+  display: grid;
+  gap: 10px;
+}
+
+.aiDecisionReceipt .aiApprovalChecklist {
+  max-width: 100%;
+  margin: 0;
+}
+
+.aiDecisionReceiptFooter {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aiDecisionReceiptFooter p {
+  margin-top: 6px;
+  font-size: 0.9rem;
   color: var(--ink);
 }
 
@@ -4729,6 +5260,42 @@ h1, h2, h3 {
   margin-top: 2px;
 }
 
+.aiProofNftCard {
+  display: grid;
+  gap: 10px;
+  flex: 1;
+}
+
+.aiProofNftGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.aiProofNftAttribute {
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.aiProofNftAttribute span {
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.aiProofNftAttribute strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
 .aiNftLink {
   margin-left: auto;
   padding: 6px 14px;
@@ -4809,6 +5376,92 @@ h1, h2, h3 {
   font-size: 0.84rem;
   color: var(--ink-muted);
   line-height: 1.55;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ECONOMIC STATE PANEL — AI Evaluation Screen
+   ═══════════════════════════════════════════════════════════════ */
+.aiEvalEconomicPanel {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(20, 241, 149, 0.04);
+  border: 1px solid rgba(20, 241, 149, 0.12);
+  animation: fadeInUp 0.35s ease-out both;
+}
+
+.aiEvalEconomicHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.aiEvalEconomicGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.aiEvalEconomicStat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.aiEvalEconomicLabel {
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+
+.aiEvalEconomicValue {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.aiEvalEconomicValue.ok   { color: var(--solana-green); }
+.aiEvalEconomicValue.warn { color: #f59e0b; }
+
+/* Budget cap warning */
+.aiEvalBudgetCapWarning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f59e0b;
+}
+
+/* Budget healthy state */
+.aiEvalBudgetOk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(20, 241, 149, 0.06);
+  border: 1px solid rgba(20, 241, 149, 0.15);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--solana-green);
 }
 
 /* --- Verification Gate --- */
@@ -4921,6 +5574,21 @@ h1, h2, h3 {
     padding: 18px;
   }
 
+  /* Collapse 4-col receipt grid → 2-col on mobile */
+  .aiDecisionReceiptGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Collapse economic stat grid → 1-col on small screens */
+  .aiEvalEconomicGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .aiDecisionEconomicRow {
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .aiMetricRow {
     grid-template-columns: 1fr;
     gap: 6px;
@@ -4936,6 +5604,10 @@ h1, h2, h3 {
   .aiApprovalBlockchain,
   .aiApprovalSummary {
     max-width: 100%;
+  }
+
+  .aiProofNftGrid {
+    grid-template-columns: 1fr;
   }
 
   .verificationGateCard {
@@ -5100,6 +5772,75 @@ h1, h2, h3 {
   color: #ff6b6b;
   background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.aiEvalVerdictCard {
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 16px;
+  animation: aiSlideUp 0.3s ease-out both;
+}
+
+.aiEvalVerdictCard.approved {
+  border: 1px solid rgba(20, 241, 149, 0.25);
+  background: linear-gradient(135deg, rgba(20, 241, 149, 0.12), rgba(20, 241, 149, 0.03));
+}
+
+.aiEvalVerdictCard.rejected {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.14), rgba(239, 68, 68, 0.03));
+}
+
+.aiEvalVerdictEyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-bottom: 8px;
+}
+
+.aiEvalVerdictCard h2 {
+  font-size: 1.3rem;
+  margin: 0 0 8px;
+}
+
+.aiEvalVerdictScore {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.aiEvalVerdictSummary {
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+
+.aiEvalVerdictDivider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 12px 0;
+}
+
+.aiEvalEvidenceTitle {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.aiEvalEvidence p {
+  margin: 4px 0;
+  color: var(--ink-muted);
+}
+
+.aiEvalVerdictReward {
+  margin-top: 12px;
+  font-weight: 700;
+  color: var(--solana-green);
+}
+
+.aiEvalVerdictReward.reject {
+  color: #ff8b8b;
 }
 
 /* Sections */

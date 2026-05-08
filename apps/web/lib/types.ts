@@ -134,3 +134,12 @@ export type MapSuggestion = {
   reasoning: string;
   confidence: number;
 };
+
+export type AIDecisionSummary = {
+  decision: "APPROVED" | "REJECTED";
+  fraudTier: "LOW" | "MEDIUM" | "HIGH";
+  fraudScore: number;
+  rewardMultiplier: number;
+  reason: string;
+  reference?: string;
+};

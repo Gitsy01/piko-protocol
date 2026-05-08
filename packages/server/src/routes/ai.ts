@@ -1,8 +1,9 @@
 import { Router, Request, Response } from "express";
 import { FraudAgent, RewardAgent } from "@depokemongo/ai";
+import { Prisma } from "@prisma/client";
 import { prisma } from "../config/db";
 import { haversineDistance, formatDistance, formatTokenAmount } from "@depokemongo/common";
-import { getErrorMessage, getErrorStatus, parseWithSchema } from "../config/http";
+import { parseWithSchema, sendError, sendSuccess } from "../config/http";
 import {
   aiFraudCheckSchema,
   aiGrowthSchema,
@@ -16,6 +17,24 @@ export const aiRouter = Router();
 
 const rewardAgent = new RewardAgent();
 const fraudAgent = new FraudAgent();
+
+function deriveFraudTier(score: number) {
+  if (score <= 15) {
+    return "LOW" as const;
+  }
+
+  if (score <= 45) {
+    return "MEDIUM" as const;
+  }
+
+  return "HIGH" as const;
+}
+
+function normalizeReasonList(value: Prisma.JsonValue | null) {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+    : [];
+}
 
 /**
  * POST /api/ai/suggest
@@ -89,10 +108,10 @@ aiRouter.post("/suggest", async (req: Request, res: Response) => {
       .sort((a, b) => b.smartScore - a.smartScore)
       .slice(0, 5);
 
-    res.json({ success: true, data: { suggestions } });
+    sendSuccess(res, { suggestions }, "AI suggestions loaded");
   } catch (error) {
     console.error("AI suggestion failed:", error);
-    res.status(getErrorStatus(error)).json({ success: false, error: getErrorMessage(error) });
+    sendError(res, error, "Failed to load AI suggestions");
   }
 });
 
@@ -101,13 +120,10 @@ aiRouter.post("/growth", async (req: Request, res: Response) => {
     const input = parseWithSchema(aiGrowthSchema, req.body);
     const analysis = await growthService.analyze(input);
 
-    res.json({
-      success: true,
-      data: analysis,
-    });
+    sendSuccess(res, analysis, "Growth analysis ready");
   } catch (error) {
     console.error("Growth analysis failed:", error);
-    res.status(getErrorStatus(error)).json({ success: false, error: getErrorMessage(error) });
+    sendError(res, error, "Failed to run growth analysis");
   }
 });
 
@@ -158,14 +174,54 @@ aiRouter.post("/fraud-check", async (req: Request, res: Response) => {
       accountAge,
     });
 
-    res.json({
-      success: true,
-      data: decision.decision,
-    });
+    sendSuccess(res, decision.decision, "Fraud check complete");
   } catch (error) {
     console.error("Fraud check failed:", error);
-    res.status(getErrorStatus(error)).json({ success: false, error: getErrorMessage(error) });
+    sendError(res, error, "Failed to run fraud check");
   }
 });
 
+aiRouter.get("/decision/:reference", async (req: Request, res: Response) => {
+  try {
+    const transaction = await prisma.transaction.findUnique({
+      where: { reference: req.params.reference },
+      select: {
+        reference: true,
+        decision: true,
+        fraudScore: true,
+        rewardMultiplier: true,
+        rewardReasons: true,
+        aiSummary: true,
+        completedAt: true,
+      },
+    });
 
+    if (!transaction || !transaction.completedAt || transaction.fraudScore == null || transaction.rewardMultiplier == null || transaction.decision == null) {
+      return res.status(404).json({
+        success: false,
+        message: "AI decision not ready for this payment reference",
+        error: "AI decision not ready for this payment reference",
+        data: null,
+      });
+    }
+
+    const reasons = normalizeReasonList(transaction.rewardReasons);
+    const reason = reasons[0] ?? transaction.aiSummary ?? "AI decision recorded for this incentive claim.";
+
+    sendSuccess(
+      res,
+      {
+        reference: transaction.reference ?? req.params.reference,
+        decision: transaction.decision as "APPROVED" | "REJECTED",
+        fraudScore: transaction.fraudScore,
+        fraudTier: deriveFraudTier(transaction.fraudScore),
+        rewardMultiplier: transaction.rewardMultiplier,
+        reason,
+      },
+      "AI decision loaded",
+    );
+  } catch (error) {
+    console.error("AI decision lookup failed:", error);
+    sendError(res, error, "Failed to load AI decision");
+  }
+});

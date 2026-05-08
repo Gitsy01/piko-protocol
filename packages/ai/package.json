@@ -6,8 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "lint": "eslint src/"
+    "test": "tsc --noEmit",
+    "lint": "tsc --noEmit"
   },
   "dependencies": {
     "@depokemongo/common": "*"

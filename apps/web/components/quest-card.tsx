@@ -19,7 +19,7 @@ export function QuestCard({ quest, compact = false }: QuestCardProps) {
       <div className="questCardGlow" />
       <div className="questCardHeader">
         <div>
-          <p className="eyebrow">Active reward</p>
+          <p className="eyebrow">Active incentive</p>
           <h2>{quest.title}</h2>
           <p className="questDescription">{quest.description}</p>
         </div>
@@ -74,12 +74,12 @@ export function QuestCard({ quest, compact = false }: QuestCardProps) {
           </div>
         </div>
         <div>
-          <p className="metricLabel">District</p>
+          <p className="metricLabel">Area</p>
           <strong>{quest.merchant.district}</strong>
         </div>
         {!compact ? (
           <Link className="primaryLink" href={`/quest/${quest.id}`}>
-            Open mission
+            Open incentive
           </Link>
         ) : null}
       </div>

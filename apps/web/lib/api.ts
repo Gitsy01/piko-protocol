@@ -4,7 +4,9 @@ import {
   demoUser,
   getDemoLeaderboard,
 } from "./demo-data";
+import type { DecisionReceiptNftMetadata, QuestCompletionReceipt } from "./decision-receipt";
 import {
+  AIDecisionSummary,
   HeatmapNode,
   LeaderboardEntry,
   MapSuggestion,
@@ -26,7 +28,8 @@ const DEMO_CLUSTER_CENTER = demoMerchants.reduce(
 );
 
 type ApiEnvelope<T> = {
-  success?: boolean;
+  success: boolean;
+  message?: string;
   data?: T;
   error?: string;
 };
@@ -221,12 +224,18 @@ export type DemoSettlementData = {
     aiSummary: string;
     xpEarned: number;
     newLevel: number;
+    economicState: {
+      vaultBalance: number;
+      budgetGuardActive: boolean;
+      effectiveMultiplierRange: string;
+    };
   };
   blockchain: {
     rewardTx: string | null;
     rewardTxMode: "live" | "simulated";
     explorerUrl: string | null;
     nftMint: string | null;
+    nftMetadata?: DecisionReceiptNftMetadata;
     nftMode: "live" | "simulated";
     nftExplorerUrl: string | null;
     txSignature: string | null;
@@ -347,11 +356,11 @@ function getWalletAvatar(wallet: string) {
 }
 
 function getLeaderboardTitle(rank: number) {
-  if (rank === 1) return "Top Trainer";
-  if (rank === 2) return "Route Raider";
-  if (rank === 3) return "Quest Ace";
-  if (rank <= 10) return "XP Climber";
-  return "League Runner";
+  if (rank === 1) return "Top Operator";
+  if (rank === 2) return "Growth Lead";
+  if (rank === 3) return "Program Analyst";
+  if (rank <= 10) return "Protocol Builder";
+  return "Network Operator";
 }
 
 function buildLeaderboardSparkline(entry: BackendLeaderboardEntry) {
@@ -424,7 +433,7 @@ function projectFallbackMerchants(lat: number, lng: number): MerchantPinType[] {
     return {
       ...projected,
       distance: distanceBetweenMeters({ lat, lng }, projected),
-      district: "Demo quest district",
+      district: "Demo merchant district",
       vibe: `${merchant.vibe} near your current location`,
     };
   }).sort((left, right) => (left.distance ?? Number.MAX_SAFE_INTEGER) - (right.distance ?? Number.MAX_SAFE_INTEGER));
@@ -462,7 +471,7 @@ function normalizeMerchant(merchant: BackendMerchant | MerchantPinType): Merchan
     rewardMultiplier: deriveRewardMultiplier(topReward),
     category: toTitleCase(merchant.category),
     district: `${toTitleCase(merchant.category)} district`,
-    vibe: merchant.description?.trim() || `${toTitleCase(merchant.category)} quest hotspot`,
+    vibe: merchant.description?.trim() || `${toTitleCase(merchant.category)} merchant program cluster`,
     isSponsored: quests.some((quest) => quest.questType.toUpperCase() === "SPONSORED"),
     isTrending: totalVisits >= 20,
     distance: merchant.distance,
@@ -525,12 +534,12 @@ function normalizeQuest(quest: BackendQuest | QuestDetail, claimStatus: ClaimSta
       lng: quest.merchant.lng,
       distance: quest.distance ?? 120,
       district: `${merchantCategory} district`,
-      vibe: quest.merchant.description?.trim() || `${merchantCategory} merchant on the live route`,
+      vibe: quest.merchant.description?.trim() || `${merchantCategory} merchant in the live network`,
     },
     requirements: [
       {
         id: "req-claim",
-        label: "Open the quest in the merchant zone",
+        label: "Open the incentive in the merchant zone",
         done: claimStatus === "PENDING" || claimStatus === "VERIFIED" || claimStatus === "REWARDED",
         hint: "Claim is created when you generate the payment request",
       },
@@ -542,9 +551,9 @@ function normalizeQuest(quest: BackendQuest | QuestDetail, claimStatus: ClaimSta
       },
       {
         id: "req-verify",
-        label: "Wait for backend verification and PIKO mint",
+        label: "Wait for backend verification and PIKO settlement",
         done: claimStatus === "REWARDED",
-        hint: "The reference key is matched on devnet before PIKO is minted",
+        hint: "The reference key is matched on devnet before PIKO is settled",
       },
     ],
     statusSteps: normalizeStatusSteps(claimStatus),
@@ -565,7 +574,7 @@ async function request<T>(path: string, init?: RequestInit, fallback?: T): Promi
     const payload = (await response.json()) as ApiEnvelope<T>;
 
     if (!response.ok || payload.success === false || payload.data === undefined) {
-      throw new Error(payload.error || `Request failed for ${path}`);
+      throw new Error(payload.message || payload.error || `Request failed for ${path}`);
     }
 
     return payload.data;
@@ -705,16 +714,24 @@ export async function verifyPayment(input: {
       txSignature: string | null;
       approved?: boolean;
       worldVerified?: boolean;
+      worldIdVerified?: boolean;
       decision?: "APPROVED" | "REJECTED";
       rewardAmount?: number;
       rewardToken?: string;
-    rewardMultiplier?: number;
-    aiSummary?: string;
-    fraudScore?: number;
-    xpEarned?: number;
-    newLevel?: number;
-    transactionId?: string;
-    nftMint?: string | null;
+      rewardMultiplier?: number;
+      aiSummary?: string;
+      fraudScore?: number;
+      fraudFlags?: string[];
+      distanceMeters?: number;
+      gpsAccuracy?: number;
+      economicState?: QuestCompletionReceipt["economicState"];
+      xpEarned?: number;
+      newLevel?: number;
+      transactionId?: string;
+      rewardAmountBaseUnits?: string;
+      rewardAmountDisplay?: string;
+      nftMint?: string | null;
+      nftMetadata?: DecisionReceiptNftMetadata;
   }>(
     "/api/payments/verify",
     { method: "POST", body: JSON.stringify(input) }
@@ -730,22 +747,7 @@ export async function completeQuest(input: {
   lng: number;
   gpsAccuracy: number;
 }) {
-  return request<{
-    verified: boolean;
-    txSignature: string | null;
-    approved: boolean;
-    worldVerified: boolean;
-    decision: "APPROVED" | "REJECTED";
-    rewardAmount: number;
-    rewardToken: string;
-    rewardMultiplier: number;
-    aiSummary: string;
-    fraudScore: number;
-    xpEarned: number;
-    newLevel: number;
-    transactionId: string;
-    nftMint?: string | null;
-  }>(
+  return request<QuestCompletionReceipt>(
     "/api/quests/complete",
     { method: "POST", body: JSON.stringify(input) }
   );
@@ -792,6 +794,10 @@ export async function getSuggestions(lat: number, lng: number) {
     { method: "POST", body: JSON.stringify({ lat, lng }) },
     { suggestions: demoSuggestions }
   );
+}
+
+export async function getAiDecision(reference: string) {
+  return request<AIDecisionSummary>(`/api/ai/decision/${encodeURIComponent(reference)}`);
 }
 
 

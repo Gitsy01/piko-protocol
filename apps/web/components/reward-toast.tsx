@@ -36,7 +36,7 @@ export function RewardToast({ title, body, highlight, onClose }: RewardToastProp
       </div>
 
       <div className="rewardToastCopy">
-        <p className="eyebrow">Reward unlocked</p>
+        <p className="eyebrow">Reward settled</p>
         <strong>{title}</strong>
         <p>{body}</p>
       </div>

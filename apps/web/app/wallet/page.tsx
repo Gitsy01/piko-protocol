@@ -24,21 +24,21 @@ export default function WalletPage() {
 
   const [displayXp, setDisplayXp] = useState(0);
   const [displayPiko, setDisplayPiko] = useState(0);
-  
+
   useEffect(() => {
     let frame: number;
     let start: number;
     const duration = 1500;
-    
+
     const animate = (time: number) => {
       if (!start) start = time;
       const progress = Math.min((time - start) / duration, 1);
-      // easeOutExpo
       const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
       setDisplayXp(Math.round(ease * profile.xp));
       setDisplayPiko(ease * profile.pikoBalance);
       if (progress < 1) frame = requestAnimationFrame(animate);
     };
+
     frame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(frame);
   }, [profile.xp, profile.pikoBalance]);
@@ -50,9 +50,9 @@ export default function WalletPage() {
       <section className="heroPanel walletHero">
         <div>
           <p className="eyebrow">Wallet command center</p>
-          <h1>Balance, badges, streaks, and the reward engine.</h1>
+          <h1>Balances, proofs, and settlement history.</h1>
           <p className="heroCopy">
-            This is your player profile, with live balances, XP momentum, collectible quest proof, and the activity trail that powers rank.
+            This is your protocol profile, with live balances, reward velocity, proof artifacts, and the activity trail behind rank.
           </p>
           <span className={`walletState ${connected ? "connected" : ""}`}>
             {connected && publicKey ? shortenAddress(publicKey.toBase58(), 6) : "Wallet disconnected"}
@@ -65,22 +65,22 @@ export default function WalletPage() {
         <article className="walletCard featureCard fancyHover">
           <p className="eyebrow">SOL balance</p>
           <h2>{profile.solBalance.toFixed(2)} SOL</h2>
-          <p className="supportText">Ready for transactions and on-chain quest actions.</p>
+          <p className="supportText">Ready for transactions and on-chain settlement actions.</p>
         </article>
         <article className="walletCard featureCard fancyHover">
           <p className="eyebrow">PIKO balance</p>
           <h2>{displayPiko.toFixed(2)} PIKO</h2>
-          <p className="supportText">{profile.totalRewards.toFixed(2)} total PIKO earned.</p>
+          <p className="supportText">{profile.totalRewards.toFixed(2)} total PIKO settled.</p>
         </article>
         <article className="walletCard featureCard fancyHover">
           <p className="eyebrow">PIKO this week</p>
           <h2>{profile.rewardsThisWeek.toFixed(2)} PIKO</h2>
-          <p className="supportText">Keep stacking live multipliers to grow the weekly haul.</p>
+          <p className="supportText">Track current-week issuance across live merchant programs.</p>
         </article>
         <article className="walletCard featureCard fancyHover">
-          <p className="eyebrow">Quest completions</p>
+          <p className="eyebrow">Program completions</p>
           <h2>{profile.questsCompleted}</h2>
-          <p className="supportText">Chain completions and repeat visits both count toward rarity drops.</p>
+          <p className="supportText">Repeat visits and chained programs both count toward protocol reputation.</p>
         </article>
       </section>
 
@@ -88,13 +88,13 @@ export default function WalletPage() {
         <article className="walletCard levelPanel">
           <div className="sectionHeader">
             <div>
-              <p className="eyebrow">Level progress</p>
+              <p className="eyebrow">Tier progress</p>
               <h2>
                 Level {profile.level} <span className="levelTitle">{profile.levelTitle}</span>
               </h2>
             </div>
             <div className="streakCluster">
-              <span className="streakFlame">🔥</span>
+              <span className="streakFlame">Signal</span>
               <strong>{profile.streak}-day streak</strong>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function WalletPage() {
             <div className="xpBarFill" style={{ width: `${xpProgress}%` }} />
           </div>
           <p className="supportText">
-            {displayXp} / {profile.nextLevelXp} XP until the next unlock tier.
+            {displayXp} / {profile.nextLevelXp} XP until the next protocol tier.
           </p>
 
           <div className="streakMeter">
@@ -119,7 +119,7 @@ export default function WalletPage() {
           <div className="sectionHeader">
             <div>
               <p className="eyebrow">Recent activity</p>
-              <h2>Momentum feed</h2>
+              <h2>Settlement feed</h2>
             </div>
           </div>
 
@@ -141,8 +141,8 @@ export default function WalletPage() {
       <section>
         <div className="sectionHeader" style={{ marginBottom: "12px" }}>
           <div>
-            <p className="eyebrow">Badge gallery</p>
-            <h2>NFT proof and rarity drops</h2>
+            <p className="eyebrow">Proof gallery</p>
+            <h2>NFT proof artifacts</h2>
           </div>
         </div>
 
@@ -153,7 +153,7 @@ export default function WalletPage() {
               <span className="badgeRarity">{badge.rarity}</span>
               <h3>{badge.name}</h3>
               <p>{badge.description}</p>
-              <small>Unlocked {new Date(badge.earnedAt).toLocaleDateString()}</small>
+              <small>Recorded {new Date(badge.earnedAt).toLocaleDateString()}</small>
             </article>
           ))}
         </div>

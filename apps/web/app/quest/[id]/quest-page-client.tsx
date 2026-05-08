@@ -2,11 +2,16 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { AIDecisionSummaryPanel } from "@/components/ai-decision-summary-panel";
+import { DecisionReceipt } from "@/components/DecisionReceipt";
 import { QuestCard } from "@/components/quest-card";
 import { ScanPayButton } from "@/components/scan-pay-button";
+import { useDemoMode } from "@/hooks/use-demo-mode";
+import type { QuestCompletionReceipt } from "@/lib/decision-receipt";
 import { useMerchantMap } from "@/hooks/use-merchant-map";
 import { getQuest } from "@/lib/api";
-import { QuestDetail } from "@/lib/types";
+import { toFriendlyMessage } from "@/lib/ui-messages";
+import { AIDecisionSummary, QuestDetail } from "@/lib/types";
 import { formatDistance } from "@/lib/utils";
 
 type QuestPageClientProps = {
@@ -14,18 +19,28 @@ type QuestPageClientProps = {
 };
 
 export function QuestPageClient({ questId }: QuestPageClientProps) {
+  const demoMode = useDemoMode();
   const { connected, publicKey } = useWallet();
   const { location, accuracy } = useMerchantMap();
   const [quest, setQuest] = useState<QuestDetail | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  const [aiDecision, setAiDecision] = useState<AIDecisionSummary | null>(null);
+  const [completionResult, setCompletionResult] = useState<QuestCompletionReceipt | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
     getQuest(questId, publicKey?.toBase58())
       .then((data) => setQuest(data.quest))
-      .catch((error) => setLoadError(error instanceof Error ? error.message : "Failed to load quest"));
+      .catch((error) =>
+        setLoadError(
+          toFriendlyMessage(
+            error instanceof Error ? error.message : "",
+            "Failed to load quest",
+          )
+        )
+      );
   }, [questId, publicKey]);
 
   useEffect(() => {
@@ -38,7 +53,7 @@ export function QuestPageClient({ questId }: QuestPageClientProps) {
       <div className="pageStack questPage">
         <section className="heroPanel walletHero">
           <p className="eyebrow">Quest unavailable</p>
-          <h1>Could not load this live quest</h1>
+          <h1>Could not load this live incentive</h1>
           <p className="heroCopy">{loadError}</p>
         </section>
       </div>
@@ -49,9 +64,9 @@ export function QuestPageClient({ questId }: QuestPageClientProps) {
     return (
       <div className="pageStack questPage">
         <section className="heroPanel walletHero">
-          <p className="eyebrow">Loading live quest</p>
-          <h1>Fetching mission state</h1>
-          <p className="heroCopy">Reading the backend quest, claim status, and merchant wallet.</p>
+          <p className="eyebrow">Loading live incentive</p>
+          <h1>Fetching settlement context</h1>
+          <p className="heroCopy">Reading merchant details, claim status, and verification context.</p>
         </section>
       </div>
     );
@@ -77,14 +92,93 @@ export function QuestPageClient({ questId }: QuestPageClientProps) {
     background: `conic-gradient(var(--brand) 0 ${progress}%, rgba(255,255,255,0.08) ${progress}% 100%)`,
   } as CSSProperties;
 
+  if (demoMode) {
+    return (
+      <div className="pageStack questPage">
+        <section className="heroPanel walletHero demoQuestHero">
+          <div>
+            <p className="eyebrow">Focused demo flow</p>
+            <h1>{quest.title}</h1>
+            <p className="heroCopy">
+              One merchant, one payment loop, one visible decision receipt.
+            </p>
+            <div className="questMetaRow">
+              <span>{quest.questType}</span>
+              <span>{quest.rewardAmount.toFixed(2)} {quest.rewardToken}</span>
+              <span>{formatDistance(quest.merchant.distance)}</span>
+            </div>
+          </div>
+          <div className="heroStats">
+            <div className="statChip">
+              <span>{quest.multiplier.toFixed(1)}x</span>
+              <p>Boost cap</p>
+            </div>
+            <div className="statChip">
+              <span>{connected ? "Ready" : "Connect"}</span>
+              <p>Wallet</p>
+            </div>
+          </div>
+        </section>
+
+        <div className="twoColumnLayout questLayout">
+          <div className="questColumn">
+            <QuestCard quest={quest} compact />
+
+            <section className="merchantMiniCard">
+              <div className="sectionHeader">
+                <div>
+                  <p className="eyebrow">Merchant card</p>
+                  <h2>{quest.merchant.name}</h2>
+                </div>
+                <span className="distanceBadge">{formatDistance(quest.merchant.distance)}</span>
+              </div>
+
+              <div className="merchantMetrics">
+                <div>
+                  <p className="metricLabel">Category</p>
+                  <strong>{quest.merchant.category}</strong>
+                </div>
+                <div>
+                  <p className="metricLabel">Area</p>
+                  <strong>{quest.merchant.district}</strong>
+                </div>
+                <div>
+                  <p className="metricLabel">Merchant profile</p>
+                  <strong>{quest.merchant.vibe}</strong>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div className="questSideColumn">
+            <ScanPayButton
+              merchantId={quest.merchantId}
+              questId={quest.id}
+              amount={devnetPaymentAmount}
+              rewardAmount={quest.rewardAmount}
+              rewardToken={quest.rewardToken}
+              userLocation={location}
+              userAccuracy={accuracy}
+              onAiDecisionChange={setAiDecision}
+              onCompletionChange={setCompletionResult}
+            />
+
+            {completionResult ? <DecisionReceipt data={completionResult} /> : null}
+            <AIDecisionSummaryPanel decision={aiDecision} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pageStack questPage">
       <section className="questSpotlight">
         <div className="questSpotlightCopy">
-          <p className="eyebrow">Active mission</p>
+          <p className="eyebrow">Active incentive</p>
           <h1>{quest.title}</h1>
           <p className="heroCopy">
-            Premium sponsored quest flow with live claim velocity, countdown pressure, and instant Solana rewards.
+            Merchant-funded incentive flow with live demand, visible verification, and instant Solana settlement.
           </p>
 
           <div className="questMetaRow">
@@ -114,13 +208,13 @@ export function QuestPageClient({ questId }: QuestPageClientProps) {
           <div className="progressRing" style={ringStyle}>
             <div className="progressRingInner">
               <strong>{progress}%</strong>
-              <span>claimed</span>
+                <span>allocated</span>
             </div>
           </div>
 
           <div className="questPulseCard">
-            <span className="metricLabel">Claim velocity</span>
-            <strong>{quest.claimVelocity}% of live zone average</strong>
+            <span className="metricLabel">Demand signal</span>
+            <strong>{quest.claimVelocity}% of live area average</strong>
             <p>{quest.bonusWindow}</p>
           </div>
         </div>
@@ -133,8 +227,8 @@ export function QuestPageClient({ questId }: QuestPageClientProps) {
           <section className="questChecklistCard">
             <div className="sectionHeader">
               <div>
-                <p className="eyebrow">Mission checklist</p>
-                <h2>Complete the loop cleanly</h2>
+                <p className="eyebrow">Settlement checklist</p>
+                <h2>Complete the verification flow cleanly</h2>
               </div>
             </div>
 
@@ -166,13 +260,13 @@ export function QuestPageClient({ questId }: QuestPageClientProps) {
                 <strong>{quest.merchant.category}</strong>
               </div>
               <div>
-                <p className="metricLabel">District</p>
-                <strong>{quest.merchant.district}</strong>
-              </div>
-              <div>
-                <p className="metricLabel">Scene</p>
-                <strong>{quest.merchant.vibe}</strong>
-              </div>
+                  <p className="metricLabel">Area</p>
+                  <strong>{quest.merchant.district}</strong>
+                </div>
+                <div>
+                  <p className="metricLabel">Merchant profile</p>
+                  <strong>{quest.merchant.vibe}</strong>
+                </div>
             </div>
           </section>
         </div>
@@ -186,13 +280,16 @@ export function QuestPageClient({ questId }: QuestPageClientProps) {
             rewardToken={quest.rewardToken}
             userLocation={location}
             userAccuracy={accuracy}
+            onCompletionChange={setCompletionResult}
           />
+
+          {completionResult ? <DecisionReceipt data={completionResult} /> : null}
 
           <section className="walletHint connectHint">
             <p className="eyebrow">Wallet status</p>
-            <h3>{connected ? "Wallet connected and ready to sign" : "Connect a wallet to finish the mission"}</h3>
+            <h3>{connected ? "Wallet connected and ready to sign" : "Connect a wallet to complete the incentive flow"}</h3>
             <p className="supportText">
-              Phantom and Backpack are ready for the QR handoff. NFC prompt stays primed for tap-based demos.
+              Phantom and Backpack are ready for the QR handoff and verification loop.
             </p>
           </section>
         </div>

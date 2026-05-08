@@ -35,7 +35,7 @@ export class OpenRouterClient {
     this.baseUrl = options?.baseUrl || process.env.OPENROUTER_BASE_URL || "https://openrouter.ai/api/v1";
     this.model = options?.model || process.env.OPENROUTER_MODEL || OPENROUTER_DEFAULT_MODEL;
     this.siteUrl = options?.siteUrl || process.env.OPENROUTER_SITE_URL;
-    this.siteName = options?.siteName || process.env.OPENROUTER_SITE_NAME || "DePokemonGo";
+    this.siteName = options?.siteName || process.env.OPENROUTER_SITE_NAME || "PIKO Protocol";
   }
 
   isConfigured(): boolean {

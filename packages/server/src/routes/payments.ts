@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { prisma } from "../config/db";
-import { getErrorMessage, getErrorStatus, parseWithSchema } from "../config/http";
+import { parseWithSchema, sendError, sendSuccess } from "../config/http";
 import {
   createPaymentRequestSchema,
   verifyPaymentSchema,
@@ -14,10 +14,10 @@ paymentRouter.post("/create-request", async (req: Request, res: Response) => {
   try {
     const input = parseWithSchema(createPaymentRequestSchema, req.body);
     const data = await paymentService.createPaymentRequest(input);
-    res.json({ success: true, data });
+    sendSuccess(res, data, "Payment request created");
   } catch (error) {
     console.error("Failed to create payment request:", error);
-    res.status(getErrorStatus(error)).json({ success: false, error: getErrorMessage(error) });
+    sendError(res, error, "Failed to create payment request");
   }
 });
 
@@ -35,7 +35,9 @@ paymentRouter.post("/verify", async (req: Request, res: Response) => {
     if (resolvedQuestId && !resolvedWallet) {
       return res.status(400).json({
         success: false,
-        error: "Wallet is required to complete a quest payment",
+        message: "Wallet is required to complete an incentive payment",
+        error: "Wallet is required to complete an incentive payment",
+        data: null,
       });
     }
 
@@ -50,11 +52,16 @@ paymentRouter.post("/verify", async (req: Request, res: Response) => {
         gpsAccuracy,
       });
 
-      return res.json({ success: true, data: result });
+      return sendSuccess(res, result, "Quest payment verified");
     }
 
     if (!pendingPayment) {
-      return res.status(404).json({ success: false, error: "Payment reference not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Payment reference not found",
+        error: "Payment reference not found",
+        data: null,
+      });
     }
 
     const merchant = await prisma.merchant.findUnique({
@@ -62,7 +69,12 @@ paymentRouter.post("/verify", async (req: Request, res: Response) => {
     });
 
     if (!merchant) {
-      return res.status(404).json({ success: false, error: "Merchant not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Merchant not found",
+        error: "Merchant not found",
+        data: null,
+      });
     }
 
     const verification = await paymentService.verifyTransactionFull(
@@ -72,34 +84,42 @@ paymentRouter.post("/verify", async (req: Request, res: Response) => {
       Math.round(pendingPayment.amount * LAMPORTS_PER_SOL),
     );
     if (!verification.verified || !verification.signature) {
-      return res.json({ success: true, data: { verified: false } });
+      return sendSuccess(res, { verified: false }, "Payment not settled yet");
     }
 
     if (!verification.recipientVerified) {
       return res.status(409).json({
         success: false,
+        message: `Payment did not go to merchant wallet ${merchant.wallet}`,
         error: `Payment did not go to merchant wallet ${merchant.wallet}`,
+        data: null,
       });
     }
 
     if (!verification.senderVerified) {
       return res.status(409).json({
         success: false,
+        message: `Payment sender does not match claimant wallet ${pendingPayment.wallet}`,
         error: `Payment sender does not match claimant wallet ${pendingPayment.wallet}`,
+        data: null,
       });
     }
 
     if (!verification.referenceVerified) {
       return res.status(409).json({
         success: false,
+        message: `Payment transaction does not include reference ${reference}`,
         error: `Payment transaction does not include reference ${reference}`,
+        data: null,
       });
     }
 
     if (!verification.amountVerified) {
       return res.status(400).json({
         success: false,
+        message: `Payment amount too low: got ${verification.amountLamports} lamports, need ${Math.round(pendingPayment.amount * LAMPORTS_PER_SOL)}`,
         error: `Payment amount too low: got ${verification.amountLamports} lamports, need ${Math.round(pendingPayment.amount * LAMPORTS_PER_SOL)}`,
+        data: null,
       });
     }
 
@@ -122,27 +142,28 @@ paymentRouter.post("/verify", async (req: Request, res: Response) => {
     await paymentService.incrementMerchantVisit(pendingPayment.merchantId);
     paymentService.clearPendingPayment(reference);
 
-    res.json({
-      success: true,
-      data: {
+    sendSuccess(
+      res,
+      {
         verified: true,
         txSignature: verification.signature,
         transactionId: transaction.id,
         approved: true,
       },
-    });
+      "Payment verified",
+    );
   } catch (error) {
     console.error("Failed to verify payment:", error);
-    res.status(getErrorStatus(error)).json({ success: false, error: getErrorMessage(error) });
+    sendError(res, error, "Failed to verify payment");
   }
 });
 
 paymentRouter.get("/status/:reference", async (req: Request, res: Response) => {
   try {
     const data = await paymentService.getPaymentStatus(req.params.reference);
-    res.json({ success: true, data });
+    sendSuccess(res, data, "Payment status loaded");
   } catch (error) {
     console.error("Failed to fetch payment status:", error);
-    res.status(getErrorStatus(error)).json({ success: false, error: getErrorMessage(error) });
+    sendError(res, error, "Failed to fetch payment status");
   }
 });

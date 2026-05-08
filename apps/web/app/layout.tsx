@@ -19,26 +19,26 @@ const body = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://depokemongo.app"),
-  applicationName: "DePokemonGo",
-  title: "DePokemonGo | Premium Solana Reward Hunts",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://piko-protocol.app"),
+  applicationName: "PIKO Protocol",
+  title: "PIKO Protocol | Real-World Programmable Incentives",
   description:
-    "A premium cyberpunk PWA for location-based merchant quests on Solana. Discover nearby hotspots, pay with Solana Pay, and earn rewards instantly.",
-  keywords: ["Solana", "Solana Pay", "crypto rewards", "merchant quests", "DePokemonGo", "web3", "PWA", "gaming rewards"],
-  authors: [{ name: "DePokemonGo Team" }],
+    "Programmable merchant incentives on Solana. Verify identity, payment, and location, then settle rewards with visible anti-cheat receipts.",
+  keywords: ["Solana", "Solana Pay", "programmable incentives", "merchant rewards", "PIKO Protocol", "web3", "PWA", "location verification"],
+  authors: [{ name: "PIKO Protocol" }],
   icons: {
     icon: "/icons/icon-192.svg",
     apple: "/icons/icon-192.svg",
   },
   openGraph: {
-    title: "DePokemonGo | Premium Solana Reward Hunts",
-    description: "Walk the map, unlock cyber quests, pay once, and earn instantly on Solana.",
+    title: "PIKO Protocol | Real-World Programmable Incentives",
+    description: "Merchant-funded incentives with identity, payment, location, AI fraud scoring, and on-chain settlement.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "DePokemonGo | Premium Solana Reward Hunts",
-    description: "Discover nearby merchants, complete quests, and collect rewards in a dark cyberpunk PWA.",
+    title: "PIKO Protocol | Real-World Programmable Incentives",
+    description: "Programmable merchant incentives with visible verification, AI scoring, and on-chain proofs.",
   },
 };
 

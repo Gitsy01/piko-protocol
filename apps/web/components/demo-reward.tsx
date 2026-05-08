@@ -1,100 +1,67 @@
 "use client";
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { DecisionReceipt } from "@/components/DecisionReceipt";
 import { useDemoContext } from "@/providers/demo-context";
 
-type ChecklistItem = {
-  id: string;
-  label: string;
-  passed: boolean;
-};
-
-function getExplorerUrl(sig: string | null) {
-  if (!sig) return null;
-  return `https://explorer.solana.com/tx/${sig}?cluster=devnet`;
+function formatSolAmount(amount: number) {
+  return `${amount.toFixed(2)} SOL`;
 }
 
-function truncateSig(sig: string | null, chars = 8) {
-  if (!sig) return "—";
-  if (sig.length <= chars * 2 + 3) return sig;
-  return `${sig.slice(0, chars)}...${sig.slice(-chars)}`;
+function getExplorerUrl(signature: string | null) {
+  if (!signature) return null;
+  return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+}
+
+function truncateSignature(signature: string | null, chars = 8) {
+  if (!signature) return "-";
+  if (signature.length <= chars * 2 + 3) return signature;
+  return `${signature.slice(0, chars)}...${signature.slice(-chars)}`;
 }
 
 export function DemoReward() {
   const { state, dispatch } = useDemoContext();
-  const { rewardResult, aiEvaluation, quest } = state;
+  const { rewardResult, aiEvaluation, decisionReceipt, quest } = state;
   const [revealStep, setRevealStep] = useState(0);
 
   const isApproved = aiEvaluation?.decision === "APPROVED";
   const explorerUrl = getExplorerUrl(rewardResult?.txSignature ?? null);
 
-  const checklist: ChecklistItem[] = useMemo(() => [
-    {
-      id: "payment",
-      label: "Payment verified on-chain",
-      passed: true,
-    },
-    {
-      id: "location",
-      label: "Location valid (GPS proof)",
-      passed: (aiEvaluation?.fraudScore ?? 0) < 50,
-    },
-    {
-      id: "human",
-      label: "Human verified (World ID)",
-      passed: aiEvaluation?.worldVerified ?? false,
-    },
-    {
-      id: "fraud",
-      label: `Fraud score passed (${(aiEvaluation?.fraudScore ?? 0).toFixed(2)})`,
-      passed: (aiEvaluation?.fraudScore ?? 0) < 50,
-    },
-    {
-      id: "reward",
-      label: `Reward calculated (${(aiEvaluation?.rewardMultiplier ?? 1).toFixed(2)}x multiplier)`,
-      passed: isApproved ?? false,
-    },
-  ], [aiEvaluation, isApproved]);
-
-  // Staggered reveal animation
   useEffect(() => {
-    if (revealStep >= checklist.length + 2) return;
-    const delay = revealStep === 0 ? 400 : 500;
-    const timer = setTimeout(() => setRevealStep((s) => s + 1), delay);
+    if (revealStep >= 3) return;
+    const delay = revealStep === 0 ? 300 : 450;
+    const timer = window.setTimeout(() => setRevealStep((current) => current + 1), delay);
     return () => clearTimeout(timer);
-  }, [revealStep, checklist.length]);
+  }, [revealStep]);
 
-  // Confetti particles
   const particles = useMemo(
     () =>
       isApproved
-        ? Array.from({ length: 24 }, (_, i) => ({
-            id: i,
+        ? Array.from({ length: 24 }, (_, index) => ({
+            id: index,
             style: {
               ["--particle-left" as string]: `${Math.random() * 100}%`,
               ["--particle-delay" as string]: `${Math.random() * 1.2}s`,
               ["--particle-color" as string]:
-                i % 4 === 0
+                index % 4 === 0
                   ? "var(--solana-green)"
-                  : i % 4 === 1
-                  ? "var(--brand)"
-                  : i % 4 === 2
-                  ? "var(--solana-purple)"
-                  : "#FFD700",
+                  : index % 4 === 1
+                    ? "var(--brand)"
+                    : index % 4 === 2
+                      ? "var(--solana-purple)"
+                      : "#FFD700",
             } as CSSProperties,
           }))
         : [],
     [isApproved]
   );
 
-  const showReward = revealStep >= checklist.length;
-  const showNft = revealStep >= checklist.length + 1;
-  const showExplorer = revealStep >= checklist.length + 2;
-
+  const showReward = revealStep >= 1;
+  const showExplorer = revealStep >= 2;
   const earnedAmount = rewardResult?.rewardAmount ?? quest.rewardAmount;
   const earnedToken = rewardResult?.rewardToken ?? quest.rewardToken;
-  const badge = rewardResult?.badgeReward ?? quest.badgeReward;
   const originalReward = aiEvaluation?.originalReward ?? quest.rewardAmount;
+  const rewardMultiplier = aiEvaluation?.rewardMultiplier ?? 1;
 
   return (
     <div
@@ -103,82 +70,67 @@ export function DemoReward() {
       role="status"
       aria-live="polite"
     >
-      {/* Confetti */}
-      {isApproved && showReward && (
+      {isApproved && showReward ? (
         <div className="aiApprovalParticles" aria-hidden="true">
-          {particles.map((p) => (
-            <div key={p.id} className="aiApprovalParticle" style={p.style} />
+          {particles.map((particle) => (
+            <div key={particle.id} className="aiApprovalParticle" style={particle.style} />
           ))}
         </div>
-      )}
+      ) : null}
 
-      {/* Header */}
       <div className="aiApprovalHeader">
         <span className="aiApprovalIcon" aria-hidden="true">
-          {isApproved ? "✅" : "🛑"}
+          {isApproved ? "OK" : "NO"}
         </span>
         <h2 className="aiApprovalTitle">
-          {isApproved ? "AI APPROVED REWARD" : "AI REJECTED CLAIM"}
+          {isApproved ? `${earnedAmount.toFixed(2)} ${earnedToken} settled` : "Reward rejected"}
         </h2>
       </div>
 
-      {/* Checklist */}
-      <div className="aiApprovalChecklist">
-        {checklist.map((item, i) => {
-          const visible = i < revealStep;
-          return (
-            <div
-              key={item.id}
-              className={`aiApprovalCheck ${visible ? "visible" : ""} ${item.passed ? "passed" : "failed"}`}
-            >
-              <span className="aiApprovalCheckIcon" aria-hidden="true">
-                {item.passed ? "✔" : "✘"}
-              </span>
-              <span>{item.label}</span>
-            </div>
-          );
-        })}
-      </div>
+      {showReward && isApproved ? (
+        <div className="demoRewardMoment">
+          <p className="eyebrow">Decision Receipt</p>
+          <strong>The anti-cheat system explains exactly why this reward cleared</strong>
+          <span>{quest.merchant.name} payment, location, identity, and travel signals all passed before settlement.</span>
+        </div>
+      ) : null}
 
-      {/* Reward reveal */}
-      {showReward && (
+      {showReward && decisionReceipt ? <DecisionReceipt data={decisionReceipt} /> : null}
+
+      {showReward ? (
         <div className={`aiRewardReveal ${isApproved ? "show" : ""}`}>
           <div className="aiRewardRevealRow">
             <span className="aiRewardLabel">Reward</span>
             <span className="aiRewardOriginal">{originalReward.toFixed(2)}</span>
-            <span className="aiRewardArrow" aria-hidden="true">→</span>
+            <span className="aiRewardArrow" aria-hidden="true">TO</span>
             <span className="aiRewardBoosted">
               {earnedAmount.toFixed(2)} {earnedToken}
             </span>
-            {(aiEvaluation?.rewardMultiplier ?? 1) > 1 && (
-              <span className="aiRewardBoostTag">AI boosted</span>
-            )}
+            {rewardMultiplier > 1 ? <span className="aiRewardBoostTag">AI boosted</span> : null}
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* NFT badge */}
-      {showNft && badge && (
-        <div className="aiNftReveal">
-          <span className="aiNftIcon" aria-hidden="true">🏅</span>
-          <div>
-            <strong>NFT Badge Minted</strong>
-            <span className="aiNftMint">{badge}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Blockchain details & actions */}
-      {showExplorer && (
+      {showExplorer ? (
         <div className="aiApprovalBlockchain">
-          {rewardResult?.txSignature && (
+          {rewardResult?.txSignature ? (
             <div className="aiApprovalBlockchainRow">
               <span>Tx Signature</span>
-              <strong>{truncateSig(rewardResult.txSignature)}</strong>
+              <strong>{truncateSignature(rewardResult.txSignature)}</strong>
             </div>
-          )}
+          ) : null}
+          <div className="aiApprovalBlockchainRow">
+            <span>Location proof</span>
+            <strong>
+              {Math.round(aiEvaluation?.locationDistanceMeters ?? 42)}m away / {Math.round(aiEvaluation?.gpsAccuracyMeters ?? 9)}m accuracy
+            </strong>
+          </div>
+          <div className="aiApprovalBlockchainRow">
+            <span>Payment proof</span>
+            <strong>{formatSolAmount(aiEvaluation?.paymentAmountSol ?? 0.05)}</strong>
+          </div>
           <div className="aiApprovalActions">
-            {explorerUrl && (
+            {explorerUrl ? (
               <a
                 id="demo-explorer-link"
                 className="primaryButton aiExplorerButton"
@@ -186,28 +138,27 @@ export function DemoReward() {
                 target="_blank"
                 rel="noreferrer"
               >
-                View on Solana Explorer →
+                View on Solana Explorer
               </a>
-            )}
+            ) : null}
             <button
               id="demo-do-another-btn"
               className="demoCta"
               type="button"
               onClick={() => dispatch({ type: "RESET" })}
             >
-              🗺️ Do Another Quest
+              Run the demo again
             </button>
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* AI summary */}
-      {showExplorer && aiEvaluation?.aiSummary && (
+      {showExplorer && aiEvaluation?.aiSummary ? (
         <div className="aiApprovalSummary">
           <span className="aiMetricLabel">AI Summary</span>
           <p>{aiEvaluation.aiSummary}</p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

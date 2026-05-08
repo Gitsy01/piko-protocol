@@ -32,12 +32,12 @@ export function VerificationGate({
   if (worldVerified) {
     return (
       <div className="verificationGate verified" id="verification-gate">
-        <div className="verificationGateIcon" aria-hidden="true">🛡️</div>
+        <div className="verificationGateIcon" aria-hidden="true">Shield</div>
         <div className="verificationGateContent">
           <strong>Human Verified</strong>
-          <span className="supportText">World ID proof accepted — claim path is unlocked.</span>
+          <span className="supportText">World ID proof accepted. The settlement path is now available.</span>
         </div>
-        <span className="verificationGateBadge verified">✔ Verified</span>
+        <span className="verificationGateBadge verified">Verified</span>
       </div>
     );
   }
@@ -45,7 +45,7 @@ export function VerificationGate({
   return (
     <div className="verificationGate blocked" id="verification-gate">
       <div className="verificationGateCard">
-        <div className="verificationGateIcon" aria-hidden="true">🔒</div>
+        <div className="verificationGateIcon" aria-hidden="true">Lock</div>
         <h3>Verification Required</h3>
         <p>
           World ID verification is required before rewards can be claimed.
@@ -64,7 +64,7 @@ export function VerificationGate({
           disabled={pending}
           onClick={() => void onVerify(buildDemoProof(wallet, sessionId))}
         >
-          {pending ? "Verifying human..." : "🌐 Verify with World ID"}
+          {pending ? "Verifying human..." : "Verify with World ID"}
         </button>
 
         <p className="verificationGateNote">

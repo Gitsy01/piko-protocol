@@ -5,7 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "qrcode";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, SystemProgram, Transaction, TransactionInstruction } from "@solana/web3.js";
-import { claimQuest, createPaymentRequest, getPaymentStatus, verifyPayment } from "@/lib/api";
+import { claimQuest, createPaymentRequest, getAiDecision, getPaymentStatus, verifyPayment } from "@/lib/api";
+import type { QuestCompletionReceipt } from "@/lib/decision-receipt";
+import type { AIDecisionSummary } from "@/lib/types";
+import { toFriendlyMessage } from "@/lib/ui-messages";
 import { RewardToast } from "./reward-toast";
 
 type ScanPayButtonProps = {
@@ -16,6 +19,8 @@ type ScanPayButtonProps = {
   rewardToken?: string;
   userLocation: { lat: number; lng: number };
   userAccuracy?: number | null;
+  onAiDecisionChange?: (decision: AIDecisionSummary | null) => void;
+  onCompletionChange?: (result: QuestCompletionReceipt | null) => void;
 };
 
 type TxStage = "ready" | "claimed" | "paying" | "rewarded";
@@ -34,6 +39,8 @@ type CompletionState = {
   xpEarned: number;
   newLevel: number;
 };
+
+type VerificationResult = Awaited<ReturnType<typeof verifyPayment>>;
 
 const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
 
@@ -69,6 +76,19 @@ function formatRewardAmount(amount: number) {
   return Number.isInteger(amount) ? amount.toString() : amount.toFixed(2).replace(/\.?0+$/, "");
 }
 
+function buildFallbackAiDecision(result: VerificationResult): AIDecisionSummary {
+  const fraudScore = result.fraudScore ?? 0;
+  const fraudTier = fraudScore <= 15 ? "LOW" : fraudScore <= 45 ? "MEDIUM" : "HIGH";
+
+  return {
+    decision: result.decision ?? "APPROVED",
+    fraudTier,
+    fraudScore,
+    rewardMultiplier: result.rewardMultiplier ?? 1,
+    reason: result.aiSummary ?? "AI decision recorded for this incentive claim.",
+  };
+}
+
 export function ScanPayButton({
   merchantId,
   questId,
@@ -77,6 +97,8 @@ export function ScanPayButton({
   rewardToken = "PIKO",
   userLocation,
   userAccuracy,
+  onAiDecisionChange,
+  onCompletionChange,
 }: ScanPayButtonProps) {
   const { connection } = useConnection();
   const { publicKey, connected, sendTransaction } = useWallet();
@@ -86,6 +108,7 @@ export function ScanPayButton({
   const [completion, setCompletion] = useState<CompletionState | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<{ title: string; body: string; highlight: string } | null>(null);
+  const [aiDecision, setAiDecision] = useState<AIDecisionSummary | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const autoVerifyingRef = useRef(false);
 
@@ -93,6 +116,54 @@ export function ScanPayButton({
   const devnetAmountLabel = `${amount.toFixed(3)} SOL`;
   const walletLink = useMemo(() => paymentUrl ?? undefined, [paymentUrl]);
   const verificationLocation = userLocation;
+
+  function publishAiDecision(nextDecision: AIDecisionSummary | null) {
+    setAiDecision(nextDecision);
+    onAiDecisionChange?.(nextDecision);
+  }
+
+  function publishCompletion(nextCompletion: QuestCompletionReceipt | null) {
+    onCompletionChange?.(nextCompletion);
+  }
+
+  async function syncAiDecision(reference: string, fallback: AIDecisionSummary) {
+    try {
+      const decision = await getAiDecision(reference);
+      publishAiDecision(decision);
+    } catch {
+      publishAiDecision(fallback);
+    }
+  }
+
+  async function applyVerifiedResult(
+    result: VerificationResult,
+    signature: string | null,
+    reference: string,
+  ) {
+    const earnedToken = result.rewardToken ?? rewardToken;
+    const earnedAmount = result.rewardAmount ?? rewardAmount;
+    const fallbackDecision = buildFallbackAiDecision(result);
+
+    setCompletion({
+      txSignature: result.txSignature ?? signature,
+      rewardToken: earnedToken,
+      rewardAmount: earnedAmount,
+      rewardMultiplier: result.rewardMultiplier ?? 1,
+      aiSummary: result.aiSummary ?? null,
+      xpEarned: result.xpEarned ?? 0,
+      newLevel: result.newLevel ?? 1,
+    });
+    publishAiDecision(fallbackDecision);
+    publishCompletion(result as QuestCompletionReceipt);
+    void syncAiDecision(reference, fallbackDecision);
+    setStage("rewarded");
+    setError(null);
+    setToast({
+      title: "Reward settled",
+      body: `You earned +${formatRewardAmount(earnedAmount)} ${earnedToken}`,
+      highlight: `+${formatRewardAmount(earnedAmount)} ${earnedToken}`,
+    });
+  }
 
   useEffect(() => {
     if (!paymentUrl || !canvasRef.current) {
@@ -139,24 +210,7 @@ export function ScanPayButton({
             return;
           }
 
-          const earnedToken = result.rewardToken ?? rewardToken;
-          const earnedAmount = result.rewardAmount ?? rewardAmount;
-          setCompletion({
-            txSignature: result.txSignature ?? status.signature,
-            rewardToken: earnedToken,
-            rewardAmount: earnedAmount,
-            rewardMultiplier: result.rewardMultiplier ?? 1,
-            aiSummary: result.aiSummary ?? null,
-            xpEarned: result.xpEarned ?? 0,
-            newLevel: result.newLevel ?? 1,
-          });
-          setStage("rewarded");
-          setError(null);
-          setToast({
-            title: "Reward unlocked!",
-            body: `You earned +${formatRewardAmount(earnedAmount)} ${earnedToken} 🎉`,
-            highlight: `+${formatRewardAmount(earnedAmount)} ${earnedToken}`,
-          });
+          await applyVerifiedResult(result, status.signature, paymentRequest.reference);
         })
         .catch(() => undefined)
         .finally(() => {
@@ -176,9 +230,9 @@ export function ScanPayButton({
     rewardAmount,
     rewardToken,
     stage,
+    userAccuracy,
     verificationLocation.lat,
     verificationLocation.lng,
-    userAccuracy,
   ]);
 
   async function generatePaymentRequest() {
@@ -190,10 +244,12 @@ export function ScanPayButton({
     setError(null);
     setCompletion(null);
     setToast(null);
+    publishAiDecision(null);
+    publishCompletion(null);
 
     try {
       if (userAccuracy == null) {
-        throw new Error("Live GPS accuracy is required before claiming this quest.");
+        throw new Error("Live GPS accuracy is required before claiming this incentive.");
       }
 
       try {
@@ -224,9 +280,10 @@ export function ScanPayButton({
     } catch (claimError) {
       setStage("ready");
       setError(
-        claimError instanceof Error
-          ? claimError.message
-          : "Failed to prepare the quest payment. Try claiming again from the merchant zone."
+        toFriendlyMessage(
+          claimError instanceof Error ? claimError.message : "",
+          "Failed to prepare the payment request. Try claiming again from the merchant zone.",
+        ),
       );
     } finally {
       setSubmitting(false);
@@ -245,7 +302,12 @@ export function ScanPayButton({
       const status = await getPaymentStatus(paymentRequest.reference);
 
       if (!status.found) {
-        setError("Payment not found on devnet yet. Once the reference lands, backend verification will finish automatically.");
+        setError(
+          toFriendlyMessage(
+            "Payment not found on devnet yet.",
+            "Payment not found on devnet yet. Once the reference lands, backend verification will finish automatically.",
+          ),
+        );
         return;
       }
 
@@ -264,28 +326,13 @@ export function ScanPayButton({
         return;
       }
 
-      const earnedToken2 = result.rewardToken ?? rewardToken;
-      const earnedAmount2 = result.rewardAmount ?? rewardAmount;
-      setCompletion({
-        txSignature: result.txSignature ?? status.signature ?? signatureHint ?? null,
-        rewardToken: earnedToken2,
-        rewardAmount: earnedAmount2,
-        rewardMultiplier: result.rewardMultiplier ?? 1,
-        aiSummary: result.aiSummary ?? null,
-        xpEarned: result.xpEarned ?? 0,
-        newLevel: result.newLevel ?? 1,
-      });
-      setStage("rewarded");
-      setToast({
-        title: "Reward unlocked!",
-        body: `You earned +${formatRewardAmount(earnedAmount2)} ${earnedToken2} 🎉`,
-        highlight: `+${formatRewardAmount(earnedAmount2)} ${earnedToken2}`,
-      });
+      await applyVerifiedResult(result, status.signature ?? signatureHint ?? null, paymentRequest.reference);
     } catch (verificationError) {
       setError(
-        verificationError instanceof Error
-          ? verificationError.message
-          : "Backend verification failed. Retry after the devnet transaction is confirmed."
+        toFriendlyMessage(
+          verificationError instanceof Error ? verificationError.message : "",
+          "Backend verification failed. Retry after the devnet transaction is confirmed.",
+        ),
       );
     } finally {
       setSubmitting(false);
@@ -327,8 +374,13 @@ export function ScanPayButton({
       } catch {
         setError("Payment sent. Waiting for backend verification to catch up on devnet.");
       }
-    } catch {
-      setError("Wallet payment failed. You can retry or open the Solana Pay link directly in your wallet.");
+    } catch (walletError) {
+      setError(
+        toFriendlyMessage(
+          walletError instanceof Error ? walletError.message : "",
+          "Wallet payment failed. You can retry or open the Solana Pay link directly in your wallet.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -342,8 +394,8 @@ export function ScanPayButton({
       <div className="payPanelHeader">
         <div>
           <p className="eyebrow">Pay & Earn</p>
-          <h3>Trigger the Solana Pay loop</h3>
-          <p className="supportText">Devnet transfer, backend verification, then PIKO mint.</p>
+          <h3>Trigger the Solana Pay settlement loop</h3>
+          <p className="supportText">Devnet transfer, backend verification, then PIKO settlement.</p>
         </div>
         <span className={`walletState ${connected ? "connected" : ""}`}>
           {connected ? "Wallet ready" : "Connect wallet"}
@@ -392,7 +444,7 @@ export function ScanPayButton({
         ) : (
           <div className="qrPlaceholder">
             <strong>Awaiting request</strong>
-            <p>Generate the quest payment to show the live Solana Pay QR.</p>
+            <p>Generate the payment request to show the live Solana Pay QR.</p>
           </div>
         )}
       </div>
@@ -442,7 +494,7 @@ export function ScanPayButton({
           </div>
           <div>
             <span className="metricLabel">AI result</span>
-            <strong>{completion.aiSummary ?? "Awaiting AI summary"}</strong>
+            <strong>{aiDecision?.reason ?? completion.aiSummary ?? "Awaiting AI summary"}</strong>
           </div>
           <div>
             <span className="metricLabel">XP earned</span>

@@ -1,0 +1,1006 @@
+/* ═══════════════════════════════════════════════════════════════
+   MERCHANT SIMULATION PAGE — Cafe Bloom
+   ═══════════════════════════════════════════════════════════════ */
+
+.merchantPage {
+  min-height: 100dvh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Topbar ── */
+.merchantPageTopbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(10,10,18,0.88);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+.merchantBackLink {
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.merchantBackLink:hover { color: var(--ink); border-color: rgba(255,255,255,0.15); }
+
+.merchantLiveDot {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--solana-green);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.merchantLivePulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--solana-green);
+  animation: userDot 2s ease-in-out infinite;
+}
+
+/* ── Hero Banner ── */
+.merchantHero {
+  position: relative;
+  min-height: 260px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.merchantHeroBg {
+  position: absolute;
+  inset: 0;
+}
+
+.merchantHeroBgImg {
+  object-fit: cover;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.merchantHeroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,10,18,0.98) 0%, rgba(10,10,18,0.6) 50%, rgba(10,10,18,0.3) 100%);
+}
+
+.merchantHeroContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 20px;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.merchantHeroLogo {
+  flex-shrink: 0;
+}
+
+.merchantLogoImg {
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(255,107,44,0.3);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+.merchantHeroInfo { flex: 1; min-width: 200px; }
+
+.merchantHeroName {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--ink) 0%, var(--brand) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.merchantHeroTagline {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.merchantHeroChips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.merchantHeroRating,
+.merchantHeroHours {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--glass-border);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.merchantHeroRating { color: var(--gold); }
+
+.merchantHeroSlowBadge {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255,107,44,0.15);
+  border: 1px solid rgba(255,107,44,0.3);
+  font-size: 0.75rem;
+  color: var(--brand);
+  font-weight: 700;
+  animation: pulseSoft 2s ease-in-out infinite;
+}
+
+.merchantHeroEconPreview {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.merchantHeroEconItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-strong);
+  border: 1px solid var(--glass-border);
+  min-width: 80px;
+}
+
+.merchantHeroEconValue {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--solana-green), var(--brand));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.merchantHeroEconLabel {
+  font-size: 0.68rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Tabs ── */
+.merchantTabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.merchantTab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+
+.merchantTab:hover { color: var(--ink); border-color: rgba(255,255,255,0.12); }
+
+.merchantTab.active {
+  background: linear-gradient(135deg, rgba(255,107,44,0.15), rgba(153,69,255,0.12));
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
+.merchantTabIcon { font-size: 0.9rem; }
+
+/* ── Tab Content ── */
+.merchantTabContent {
+  flex: 1;
+  padding: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* ── Overview Tab ── */
+.merchantOverview {
+  display: grid;
+  gap: 16px;
+}
+
+.merchantAboutCard,
+.merchantDetailsCard,
+.merchantQuickEcon {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+}
+
+.merchantAboutCard h3,
+.merchantDetailsCard h3,
+.merchantQuickEcon h3 {
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.merchantAboutCard p {
+  color: var(--ink-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.merchantTagList {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.merchantTag {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(153,69,255,0.1);
+  border: 1px solid rgba(153,69,255,0.2);
+  color: var(--solana-purple);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.merchantDetailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.85rem;
+}
+.merchantDetailRow:last-child { border-bottom: none; }
+.merchantDetailRow span { color: var(--ink-muted); }
+.merchantDetailRow strong { color: var(--ink); }
+.merchantDetailWallet { font-family: monospace; font-size: 0.78rem; color: var(--solana-purple) !important; }
+
+.merchantQuickEconGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.merchantQuickEconCard {
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-glow);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.merchantQuickEconValue {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.merchantQuickEconValue.green { color: var(--solana-green); }
+.merchantQuickEconValue.brand { color: var(--brand); }
+
+.merchantQuickEconLabel {
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Menu Tab ── */
+.merchantMenuSection { display: grid; gap: 16px; }
+
+.merchantMenuFilters {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px;
+}
+
+.merchantMenuFilterBtn {
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.merchantMenuFilterBtn.active {
+  background: rgba(255,107,44,0.12);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.merchantMenuPhoto {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.merchantMenuImage {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+.merchantMenuGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.merchantMenuCard {
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.merchantMenuCard:hover { border-color: rgba(255,107,44,0.2); transform: translateY(-2px); }
+.merchantMenuCard.popular { border-color: rgba(255,215,0,0.2); }
+
+.merchantMenuCardTop { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.merchantMenuItemName { font-weight: 600; font-size: 0.9rem; }
+
+.merchantMenuPopularBadge {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(255,215,0,0.1);
+  color: var(--gold);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.merchantMenuCardBottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.merchantMenuPrice {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.merchantMenuPriceUsd {
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+}
+
+.merchantMenuPikoBadge {
+  margin-left: auto;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(20,241,149,0.08);
+  border: 1px solid rgba(20,241,149,0.15);
+  color: var(--solana-green);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* ── Transaction Feed ── */
+.merchantTxFeed { display: grid; gap: 12px; }
+
+.merchantTxHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.merchantTxHeader h3 { font-size: 1.05rem; }
+.merchantTxCount {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(20,241,149,0.08);
+  color: var(--solana-green);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.merchantTxList { display: grid; gap: 6px; }
+
+.merchantTxRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  position: relative;
+  transition: border-color 0.2s;
+  flex-wrap: wrap;
+}
+
+.merchantTxRow:hover { border-color: rgba(255,255,255,0.1); }
+.merchantTxRow.rejected { border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.03); }
+
+.merchantTxLeft { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+.merchantTxStatusDot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.merchantTxStatusDot.settled { background: var(--solana-green); }
+.merchantTxStatusDot.rejected { background: var(--danger); }
+.merchantTxStatusDot.pending { background: var(--gold); }
+
+.merchantTxItem { font-size: 0.85rem; font-weight: 600; display: block; }
+.merchantTxWallet { font-size: 0.72rem; color: var(--ink-dim); font-family: monospace; display: block; }
+
+.merchantTxRight { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.merchantTxAmount { font-size: 0.85rem; font-weight: 600; }
+.merchantTxPiko { color: var(--solana-green); font-size: 0.78rem; font-weight: 700; }
+.merchantTxRejected { color: var(--danger); font-size: 0.78rem; font-weight: 700; }
+.merchantTxTime { font-size: 0.7rem; color: var(--ink-dim); min-width: 50px; text-align: right; }
+
+.merchantTxMultiplier {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(255,107,44,0.12);
+  color: var(--brand);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.merchantTxRejectBanner {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.15);
+  color: var(--danger);
+  font-size: 0.75rem;
+}
+
+.merchantTxLoadMore {
+  padding: 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.merchantTxLoadMore:hover { color: var(--ink); border-color: rgba(255,255,255,0.12); }
+
+/* ── Economics Dashboard ── */
+.merchantEconDash { display: grid; gap: 20px; }
+
+.merchantEconHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+
+.merchantEconSlowHourBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(255,107,44,0.12);
+  border: 1px solid rgba(255,107,44,0.3);
+  color: var(--brand);
+  font-size: 0.82rem;
+  font-weight: 700;
+  animation: pulseSoft 2.5s ease-in-out infinite;
+}
+
+.merchantEconSlowHourPulse {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--brand);
+  animation: userDot 1.5s ease-in-out infinite;
+}
+
+.merchantEconBudgetRow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  flex-wrap: wrap;
+}
+
+.merchantBudgetRing { flex-shrink: 0; }
+
+.merchantEconBudgetMetrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.merchantEconMetric { display: flex; flex-direction: column; gap: 2px; }
+
+.merchantEconMetricLabel {
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.merchantEconMetricValue {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.merchantEconMetricValue.brand { color: var(--brand); }
+.merchantEconMetricValue.green { color: var(--solana-green); }
+
+/* Multiplier Timeline */
+.merchantEconMultiplierSection {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+}
+
+.merchantEconMultiplierSection h4 { font-size: 0.95rem; margin-bottom: 12px; }
+
+.merchantEconMultiplierTimeline {
+  display: flex;
+  gap: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.merchantEconMultiplierBlock {
+  flex: 1;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.merchantEconMultiplierBlock.normal {
+  background: rgba(153,69,255,0.06);
+  border: 1px solid rgba(153,69,255,0.1);
+}
+
+.merchantEconMultiplierBlock.slow {
+  background: rgba(255,107,44,0.1);
+  border: 1px solid rgba(255,107,44,0.25);
+  animation: pulseSoft 3s ease-in-out infinite;
+}
+
+.merchantEconMultiplierBlock span { font-size: 0.72rem; color: var(--ink-dim); }
+.merchantEconMultiplierBlock strong {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.merchantEconMultiplierBlock.slow strong { color: var(--brand); }
+.merchantEconMultiplierBlock.normal strong { color: var(--ink); }
+.merchantEconMultiplierBlock small { font-size: 0.68rem; color: var(--ink-dim); }
+
+/* KPI Grid */
+.merchantEconKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.merchantEconKpi {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.merchantEconKpiValue {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--brand), var(--solana-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.merchantEconKpiLabel {
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Traffic Chart */
+.merchantEconTrafficSection,
+.merchantEconDrainSection {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+}
+
+.merchantEconTrafficSection h4,
+.merchantEconDrainSection h4 {
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+.merchantTrafficChart { display: grid; gap: 10px; }
+
+.merchantTrafficBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 100px;
+}
+
+.merchantTrafficBar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 4px;
+}
+
+.merchantTrafficBarFill {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  background: var(--solana-purple);
+  transition: height 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  min-height: 2px;
+}
+
+.merchantTrafficBarFill.slowHour { background: var(--brand); }
+
+.merchantTrafficBarLabel {
+  font-size: 0.58rem;
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+
+.merchantTrafficLegend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+}
+
+.merchantTrafficLegendDot {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* Drain Curve */
+.merchantDrainCurve {
+  width: 100%;
+  height: auto;
+  max-height: 140px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .merchantHeroContent { flex-direction: column; align-items: flex-start; }
+  .merchantHeroEconPreview { width: 100%; justify-content: space-between; }
+  .merchantEconBudgetRow { flex-direction: column; align-items: center; }
+  .merchantEconBudgetMetrics { width: 100%; }
+  .merchantEconMultiplierTimeline { flex-direction: column; }
+  .merchantMenuGrid { grid-template-columns: 1fr; }
+}
+
+/* ── Fraud Rejection Expanded ── */
+.merchantTxRejectExpanded {
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(239,68,68,0.06);
+  border: 1px solid rgba(239,68,68,0.18);
+  display: grid;
+  gap: 6px;
+}
+
+.merchantTxRejectHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.merchantTxRejectIcon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: var(--danger);
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.merchantTxRejectTitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--danger);
+}
+
+.merchantTxRejectFlag {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: rgba(239,68,68,0.8);
+  padding-left: 4px;
+}
+
+.merchantTxRejectFlagDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--danger);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+/* ── ROI Panel ── */
+.merchantEconRoiPanel {
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid rgba(20,241,149,0.12);
+  box-shadow: 0 0 0 1px rgba(20,241,149,0.04) inset;
+}
+
+.merchantEconRoiHeader {
+  margin-bottom: 16px;
+}
+
+.merchantEconRoiHeader h4 {
+  font-size: 1rem;
+  margin-top: 4px;
+}
+
+.merchantEconRoiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.merchantEconRoiCard {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface-glow);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s;
+}
+
+.merchantEconRoiCard.highlight {
+  border-color: rgba(20,241,149,0.2);
+  background: rgba(20,241,149,0.04);
+}
+
+.merchantEconRoiCard.danger {
+  border-color: rgba(239,68,68,0.15);
+  background: rgba(239,68,68,0.03);
+}
+
+.merchantEconRoiValue {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.merchantEconRoiCard.highlight .merchantEconRoiValue {
+  color: var(--solana-green);
+}
+
+.merchantEconRoiCard.danger .merchantEconRoiValue {
+  color: var(--danger);
+}
+
+.merchantEconRoiLabel {
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
+
+/* ── Network Effect Panel ── */
+.merchantNetworkPanel {
+  display: grid;
+  gap: 20px;
+}
+
+.merchantNetworkHeader { display: grid; gap: 6px; }
+
+.merchantNetworkStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.merchantNetworkStat {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.merchantNetworkStatValue {
+  font-family: var(--font-display), 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--solana-green), var(--solana-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.merchantNetworkStatLabel {
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.merchantNetworkList {
+  display: grid;
+  gap: 6px;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+}
+
+.merchantNetworkRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+  font-size: 0.84rem;
+}
+
+.merchantNetworkRow:hover {
+  background: var(--surface-glow);
+  border-color: var(--glass-border);
+}
+
+.merchantNetworkRow.inactive {
+  opacity: 0.55;
+}
+
+.merchantNetworkDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-dim);
+  flex-shrink: 0;
+}
+
+.merchantNetworkDot.active {
+  background: var(--solana-green);
+  box-shadow: 0 0 6px rgba(20,241,149,0.5);
+}
+
+.merchantNetworkName {
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.merchantNetworkCat {
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  min-width: 90px;
+}
+
+.merchantNetworkDist {
+  font-size: 0.72rem;
+  color: var(--ink-dim);
+  min-width: 50px;
+  text-align: right;
+}
+
+.merchantNetworkPiko {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--solana-purple);
+  min-width: 70px;
+  text-align: right;
+}
+
+.merchantNetworkStatus {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  min-width: 46px;
+  text-align: right;
+}
+
+.merchantNetworkStatus.active {
+  color: var(--solana-green);
+}
+
