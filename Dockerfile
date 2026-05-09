@@ -8,7 +8,6 @@ COPY turbo.json ./
 COPY apps ./apps
 COPY packages ./packages
 COPY scripts ./scripts
-COPY tsconfig.json ./
 
 RUN npm install
 
