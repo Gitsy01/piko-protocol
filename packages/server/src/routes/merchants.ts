@@ -83,6 +83,40 @@ async function registerMerchant(req: Request, res: Response) {
 }
 
 /**
+ * GET /api/merchants
+ */
+merchantRouter.get("/", async (_req: Request, res: Response) => {
+  try {
+    const merchants = await prisma.merchant.findMany({
+      where: { isActive: true },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+      include: {
+        quests: {
+          where: { isActive: true, expiresAt: { gt: new Date() } },
+          select: {
+            id: true,
+            title: true,
+            rewardAmount: true,
+            rewardToken: true,
+            questType: true,
+            xpReward: true,
+            expiresAt: true,
+            claimedCount: true,
+            maxClaims: true,
+          },
+        },
+      },
+    });
+
+    res.json({ success: true, data: { merchants } });
+  } catch (error) {
+    console.error("Failed to fetch merchants:", error);
+    res.status(getErrorStatus(error)).json({ success: false, error: getErrorMessage(error) });
+  }
+});
+
+/**
  * GET /api/merchants/nearby
  * Query: lat, lng, radius (meters), filter
  */
