@@ -1,4 +1,4 @@
-import { ZodError, ZodSchema } from "zod";
+import { ZodError, type ZodTypeAny, type output } from "zod";
 import { Response } from "express";
 
 export class HttpError extends Error {
@@ -11,7 +11,7 @@ export class HttpError extends Error {
   }
 }
 
-export function parseWithSchema<T>(schema: ZodSchema<T>, input: unknown): T {
+export function parseWithSchema<TSchema extends ZodTypeAny>(schema: TSchema, input: unknown): output<TSchema> {
   return schema.parse(input);
 }
 

@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "main": "dist/index.js",
-  "scripts": {
-  },
+ "scripts": {
+  "dev": "tsx watch src/index.ts",
+  "build": "tsc"
+},
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.0",
     "@depokemongo/ai": "*",

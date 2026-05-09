@@ -12,7 +12,9 @@ export const paymentRouter = Router();
 
 paymentRouter.post("/create-request", async (req: Request, res: Response) => {
   try {
-    const input = parseWithSchema(createPaymentRequestSchema, req.body);
+    const input = parseWithSchema(createPaymentRequestSchema, req.body) as Parameters<
+      typeof paymentService.createPaymentRequest
+    >[0];
     const data = await paymentService.createPaymentRequest(input);
     sendSuccess(res, data, "Payment request created");
   } catch (error) {

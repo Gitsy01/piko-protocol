@@ -275,18 +275,21 @@ export class PaymentService {
       completedAt: input.completedAt ?? null,
     };
 
+    const update = payload as Prisma.TransactionUncheckedUpdateInput;
+    const create = payload as Prisma.TransactionUncheckedCreateInput;
+
     if (input.reference) {
       return prisma.transaction.upsert({
         where: { reference: input.reference },
-        update: payload,
-        create: payload,
+        update,
+        create,
       });
     }
 
     return prisma.transaction.upsert({
       where: { txSignature: input.txSignature },
-      update: payload,
-      create: payload,
+      update,
+      create,
     });
   }
 

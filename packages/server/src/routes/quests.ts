@@ -59,7 +59,9 @@ questRouter.get("/:id", async (req: Request, res: Response) => {
 
 questRouter.post("/", async (req: Request, res: Response) => {
   try {
-    const payload = parseWithSchema(createQuestSchema, req.body);
+    const payload = parseWithSchema(createQuestSchema, req.body) as Parameters<
+      typeof questService.createQuest
+    >[0];
     const quest = await questService.createQuest(payload);
     sendSuccess(res, { quest }, "Quest created", 201);
   } catch (error) {

@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from "express";
 import { prisma } from "../config/db";
 import { getErrorMessage, getErrorStatus, parseWithSchema } from "../config/http";
 import { verifyWorldIdSchema } from "../config/validation";
-import { verifyWorldIdProof } from "../lib/worldId";
+import { type VerifyWorldIdInput, verifyWorldIdProof } from "../lib/worldId";
 
 export const identityRouter = Router();
 
@@ -15,7 +15,7 @@ type WorldIdentityUser = {
 
 identityRouter.post("/verify-world-id", async (req: Request, res: Response) => {
   try {
-    const input = parseWithSchema(verifyWorldIdSchema, req.body);
+    const input = parseWithSchema(verifyWorldIdSchema, req.body) as VerifyWorldIdInput;
     const verification = await verifyWorldIdProof(input);
 
     const existingNullifierOwner = (await (prisma.user as any).findUnique({
