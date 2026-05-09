@@ -17,4 +17,4 @@ RUN npm run build
 
 EXPOSE 3001
 
-CMD ["npm", "run", "dev:server"]
+CMD ["node", "packages/server/dist/index.js"]
