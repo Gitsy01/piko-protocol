@@ -11,7 +11,7 @@ COPY scripts ./scripts
 
 RUN npm install
 
-RUN npm run build
+RUN npx prisma generate
 
 EXPOSE 3001
 
