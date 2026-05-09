@@ -29,8 +29,14 @@ const io = new SocketIO(server, {
 app.use(cors());
 app.use(express.json());
 
+const healthResponse = { ok: true };
+
+app.get("/health", (_req, res) => {
+  res.json(healthResponse);
+});
+
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  res.json(healthResponse);
 });
 
 app.use("/api/merchants", merchantRouter);
@@ -56,24 +62,18 @@ server.on("error", (error: NodeJS.ErrnoException) => {
   throw error;
 });
 
-async function startServer() {
-  // Non-fatal: don't let a slow Solana RPC prevent the server from starting
-  try {
-    await assertPikoMintDecimals();
-  } catch (error) {
-    console.warn("⚠ PIKO mint decimal check failed (non-fatal):", error);
-  }
-
+function startServer() {
   // Bind to 0.0.0.0 so Railway / Docker healthchecks can reach the server
   const HOST = "0.0.0.0";
   server.listen(PORT, HOST, () => {
     console.log(`PIKO Protocol API listening on http://${HOST}:${PORT}`);
+
+    void assertPikoMintDecimals().catch((error) => {
+      console.warn("PIKO mint decimal check failed (non-fatal):", error);
+    });
   });
 }
 
-void startServer().catch((error) => {
-  console.error("Failed to start server:", error);
-  process.exit(1);
-});
+startServer();
 
 export { io };

@@ -3,7 +3,7 @@ import path from "path";
 import dotenv from "dotenv";
 import { z } from "zod";
 
-// Resolve repo root — works from both src/ (tsx watch) and dist/ (compiled)
+// Resolve repo root; works from both src/ (tsx watch) and dist/ (compiled).
 export const repoRoot = path.resolve(__dirname, "../../../..");
 const serverRoot = path.resolve(repoRoot, "packages/server");
 
@@ -13,7 +13,7 @@ for (const envPath of [
   path.join(serverRoot, ".env"),
 ]) {
   if (fs.existsSync(envPath)) {
-    dotenv.config({ path: envPath, override: true });
+    dotenv.config({ path: envPath });
   }
 }
 
