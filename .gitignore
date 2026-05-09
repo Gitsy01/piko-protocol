@@ -9,5 +9,46 @@ target/
 .anchor/
 test-ledger/
 wallet/*.json
+## Wallets, keypairs and private key files
+wallet/*.json
+*-keypair.json
+*.keypair.json
 
-.fetch-coder/checkpoints/
+## Environment files and secrets
+.env
+.env.local
+.env.*
+.env.production
+.env.*.local
+secrets.json
+secrets/*.json
+
+## Private keys, certs and jwks
+*.pem
+private*.key
+*.private.key
+*.p12
+*.jwk
+*.secret
+
+## RPC / credentials / config
+.netrc
+.npmrc
+/.aws/credentials
+aws-credentials
+
+## OpenRouter / API keys
+openrouter*
+OPENROUTER*
+openrouter.env
+openrouter.key
+.vercel
+.railway
+coverage
+*.sqlite
+*.db
+
+anchor-wallet.json
+backend.json
+dev-wallet.json
+
