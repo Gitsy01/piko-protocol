@@ -11,7 +11,7 @@ COPY scripts ./scripts
 
 RUN npm install
 
-RUN npx prisma generate
+RUN cd packages/server && npx prisma generate
 
 EXPOSE 3001
 
