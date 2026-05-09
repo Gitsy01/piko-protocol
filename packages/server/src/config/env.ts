@@ -1,12 +1,21 @@
+import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
 import { z } from "zod";
 
+// Resolve repo root — works from both src/ (tsx watch) and dist/ (compiled)
 export const repoRoot = path.resolve(__dirname, "../../../..");
 const serverRoot = path.resolve(repoRoot, "packages/server");
 
-dotenv.config({ path: path.join(repoRoot, ".env") });
-dotenv.config({ path: path.join(serverRoot, ".env"), override: true });
+// Load .env files only if they exist (they won't in Railway / Docker)
+for (const envPath of [
+  path.join(repoRoot, ".env"),
+  path.join(serverRoot, ".env"),
+]) {
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath, override: true });
+  }
+}
 
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1).default("postgresql://localhost:5432/depokemongo"),

@@ -1,0 +1,14 @@
+node_modules/
+.next/
+dist/
+.turbo/
+.git/
+.anchor/
+target/
+test-ledger/
+.codex-logs/
+*.log
+*.md
+.env
+.env.*
+wallet/*.json

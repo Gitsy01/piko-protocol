@@ -57,10 +57,17 @@ server.on("error", (error: NodeJS.ErrnoException) => {
 });
 
 async function startServer() {
-  await assertPikoMintDecimals();
+  // Non-fatal: don't let a slow Solana RPC prevent the server from starting
+  try {
+    await assertPikoMintDecimals();
+  } catch (error) {
+    console.warn("⚠ PIKO mint decimal check failed (non-fatal):", error);
+  }
 
-  server.listen(PORT, () => {
-    console.log(`PIKO Protocol API listening on http://localhost:${PORT}`);
+  // Bind to 0.0.0.0 so Railway / Docker healthchecks can reach the server
+  const HOST = "0.0.0.0";
+  server.listen(PORT, HOST, () => {
+    console.log(`PIKO Protocol API listening on http://${HOST}:${PORT}`);
   });
 }
 
