@@ -1,0 +1,11 @@
+.anchor
+.git
+.next
+.turbo
+coverage
+dist
+node_modules
+target
+test-ledger
+*.log
+*.tsbuildinfo

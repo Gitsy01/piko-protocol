@@ -110,7 +110,7 @@ export function useMerchantMap() {
       // Offline merchant cache
       try {
         localStorage.setItem(
-          "depokemongo:merchant-cache",
+          "piko:merchant-cache",
           JSON.stringify({
             timestamp: Date.now(),
             merchants: merchantResult.merchants,
@@ -125,7 +125,7 @@ export function useMerchantMap() {
     load().catch(() => {
       // Restore from offline cache
       try {
-        const cached = localStorage.getItem("depokemongo:merchant-cache");
+        const cached = localStorage.getItem("piko:merchant-cache");
         if (cached) {
           const parsed = JSON.parse(cached) as {
             merchants: MerchantPinType[];

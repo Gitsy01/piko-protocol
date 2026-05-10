@@ -1,4 +1,5 @@
 import { HttpError } from "../config/http";
+import { log } from "../config/logger";
 
 export type VerifyWorldIdInput = {
   userWallet: string;
@@ -28,7 +29,7 @@ export async function verifyWorldIdProof(input: VerifyWorldIdInput): Promise<Ver
     throw new HttpError(400, "Incomplete World ID payload");
   }
 
-  console.log("World ID verification attempt:", nullifierHash);
+  log("debug", "World ID verification attempt", { nullifierHash });
 
   return {
     verified: true,

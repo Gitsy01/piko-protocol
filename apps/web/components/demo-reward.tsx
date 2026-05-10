@@ -90,7 +90,7 @@ export function DemoReward() {
       {showReward && isApproved ? (
         <div className="demoRewardMoment">
           <p className="eyebrow">Decision Receipt</p>
-          <strong>The anti-cheat system explains exactly why this reward cleared</strong>
+          <strong>The scoring system explains why this reward cleared</strong>
           <span>{quest.merchant.name} payment, location, identity, and travel signals all passed before settlement.</span>
         </div>
       ) : null}

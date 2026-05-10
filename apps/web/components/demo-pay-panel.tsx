@@ -260,7 +260,7 @@ export function DemoPayPanel() {
 
       <VerificationGate
         worldVerified={worldVerified}
-        wallet="demo-wallet"
+        wallet="controlled-wallet"
         sessionId="demo-flow"
         pending={verifyPending}
         onVerify={handleWorldIdVerify}
@@ -276,7 +276,7 @@ export function DemoPayPanel() {
             <div className="demoPayStepArrow" aria-hidden="true">DOWN</div>
             <div className="demoPayStep">
               <span className="demoPayStepNum">2</span>
-              <span>Confirm the <strong>mock payment</strong></span>
+              <span>Run the <strong>controlled scoring event</strong></span>
             </div>
             <div className="demoPayStepArrow" aria-hidden="true">DOWN</div>
             <div className="demoPayStep">
@@ -314,7 +314,7 @@ export function DemoPayPanel() {
           </button>
 
           <p className="demoPayWalletNote">
-            This step is mocked on purpose so the demo stays fast, reliable, and repeatable.
+            This controlled path is repeatable for judges. Use the live Phantom path to prove wallet approval.
           </p>
         </>
       ) : null}

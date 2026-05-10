@@ -5,7 +5,8 @@
   "main": "dist/index.js",
  "scripts": {
   "dev": "tsx watch src/index.ts",
-  "build": "tsc"
+  "build": "tsc",
+  "test": "tsx --test test/*.test.ts"
 },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.0",

@@ -114,8 +114,8 @@ export function DecisionReceipt({ data }: Props) {
       <div style={{ padding: "0 16px" }}>
         <Check
           ok={data.worldIdVerified}
-          label="Identity — World ID"
-          detail={data.worldIdVerified ? "1 human · 1 wallet · sybil-resistant" : "World ID not verified"}
+          label="Identity — Human Signal"
+          detail={data.worldIdVerified ? "Human-verification signal recorded" : "Identity signal not verified"}
         />
         <Check
           ok={Boolean(data.txSignature)}

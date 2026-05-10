@@ -1,0 +1,12 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" fill="#101820"/>
+  <rect x="72" y="72" width="880" height="880" rx="64" fill="#F8F1E5"/>
+  <rect x="120" y="120" width="784" height="784" rx="40" fill="#101820"/>
+  <circle cx="512" cy="384" r="144" fill="#F2C14E"/>
+  <path d="M512 256L542.2 347.8H638.8L560.6 404.4L590.5 496L512 439.4L433.5 496L463.4 404.4L385.2 347.8H481.8L512 256Z" fill="#101820"/>
+  <path d="M292 658C292 585.1 351.1 526 424 526H600C672.9 526 732 585.1 732 658V724C732 746.1 714.1 764 692 764H332C309.9 764 292 746.1 292 724V658Z" fill="#2E8B57"/>
+  <rect x="334" y="620" width="356" height="48" rx="24" fill="#F8F1E5"/>
+  <rect x="374" y="700" width="276" height="32" rx="16" fill="#F8F1E5"/>
+  <text x="512" y="842" text-anchor="middle" fill="#F8F1E5" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="700">CONTRIBUTOR PROOF</text>
+  <text x="512" y="890" text-anchor="middle" fill="#F2C14E" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">PIKO VERIFIED</text>
+</svg>

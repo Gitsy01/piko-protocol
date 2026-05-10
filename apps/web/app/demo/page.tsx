@@ -23,12 +23,12 @@ import { VerificationGate } from "@/components/verification-gate";
 
 
 const INTRO_TEXT =
-  "Before claiming rewards, users must prove they are real humans using World ID. This prevents bots from farming incentives. Then our AI evaluates fraud risk and dynamically adjusts rewards. Finally, the protocol executes on-chain and issues both tokens and NFTs.";
+  "Before rewards settle, users provide a human-verification signal. Then AI-assisted scoring evaluates behavioral risk and reward economics. Finally, the protocol executes on-chain and issues tokens and proof NFTs.";
 
 const STEPS = [
   { id: 0, label: "Opening narration", layer: "Protocol intro" },
   { id: 1, label: "Merchant creates incentive", layer: "Layer 3 - API" },
-  { id: 2, label: "World ID verification", layer: "Layer 4 -> 3" },
+  { id: 2, label: "Identity verification", layer: "Layer 4 -> 3" },
   { id: 3, label: "Claim incentive", layer: "Layer 3 - API" },
   { id: 4, label: "AI evaluation", layer: "Layer 2 - AI" },
   { id: 5, label: "Blockchain output", layer: "Layer 1 - Solana" },
@@ -151,7 +151,7 @@ function JsonCard({
 }
 
 export default function DemoPage() {
-  const [sessionId] = useState(createSessionId);
+  const [sessionId, setSessionId] = useState("demo-session-pending");
   const [demoKey, setDemoKey] = useState<string | undefined>(undefined);
   const [searchReady, setSearchReady] = useState(false);
 
@@ -192,6 +192,7 @@ export default function DemoPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    setSessionId(createSessionId());
     setDemoKey(params.get("key") ?? undefined);
     setSearchReady(true);
   }, []);
@@ -423,7 +424,7 @@ export default function DemoPage() {
   async function handleVerifyWorldId(payload: WorldIdProofPayload) {
     setVerifyPending(true);
     setActionError(null);
-    appendLocalLog(2, "api", "info", "World ID proof submitted", "User is proving humanness before claim.", payload);
+    appendLocalLog(2, "api", "info", "Identity proof submitted", "User is providing a human-verification signal before claim.", payload);
 
     try {
       const data: WorldIdVerificationData = await verifyWorldId(payload);
@@ -434,10 +435,10 @@ export default function DemoPage() {
         verificationLevel: data.verificationLevel,
       });
       setCurrentStep(3);
-      appendLocalLog(2, "api", "success", "World ID verified", "Human verification stored for the demo wallet.", data);
+      appendLocalLog(2, "api", "success", "Identity signal recorded", "Human-verification signal stored for the demo wallet.", data);
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : "World ID verification failed.");
-      appendLocalLog(2, "api", "error", "World ID verification failed", error instanceof Error ? error.message : undefined);
+      setActionError(error instanceof Error ? error.message : "Identity verification failed.");
+      appendLocalLog(2, "api", "error", "Identity verification failed", error instanceof Error ? error.message : undefined);
     } finally {
       setVerifyPending(false);
     }
@@ -455,7 +456,7 @@ export default function DemoPage() {
       "api",
       "info",
       "Claim request sent",
-      forceReject ? "Claim will continue through the reject scenario." : "Claim passed the World ID gate and is moving to AI.",
+      forceReject ? "Claim will continue through the reject scenario." : "Claim passed the identity gate and is moving to AI.",
       {
         questId: createData.quest.id,
         wallet: bootstrap.demoWallet,
@@ -593,7 +594,7 @@ export default function DemoPage() {
           <div className="demoStageStack">
             <div className="demoNarrationCard">
               <p className="eyebrow">Demo script</p>
-              <h2>PIKO + World ID, narrated live.</h2>
+              <h2>PIKO Protocol, narrated live.</h2>
               <p className="heroCopy demoTypewriter">
                 {introText}
                 {introText.length < INTRO_TEXT.length ? <span className="demoCaret" aria-hidden="true" /> : null}
@@ -727,7 +728,7 @@ export default function DemoPage() {
           <div className="demoStageStack">
             <div className="demoNarrationCard">
               <p className="eyebrow">Layer 4 to 3</p>
-              <h2>World ID is the gatekeeper.</h2>
+              <h2>Identity layer gates the reward path.</h2>
               <p className="heroCopy">
                 Rewards are locked until the wallet proves it belongs to a real human.
                 No manual bypass — the protocol enforces this cryptographically.
@@ -743,7 +744,7 @@ export default function DemoPage() {
             />
 
             <JsonCard
-              title="World ID record"
+              title="Identity signal record"
               data={
                 worldVerification?.worldVerified
                   ? worldVerification
@@ -811,7 +812,7 @@ export default function DemoPage() {
               data={{
                 questId: createData?.quest.id,
                 worldVerified: worldVerification?.worldVerified ?? false,
-                rule: "if (!user.worldVerified) throw new Error('World ID verification required')",
+                rule: "if (!user.worldVerified) throw new Error('Identity verification required')",
               }}
             />
           </div>
@@ -825,7 +826,7 @@ export default function DemoPage() {
               <h2>AI evaluates every claim in real-time.</h2>
               <p className="heroCopy">
                 Three agents work together: Fraud detection scores risk, Reward optimization calculates the multiplier,
-                and World ID verification is factored into the final decision.
+                and the identity-layer signal is factored into the final decision.
               </p>
             </div>
 
@@ -915,10 +916,10 @@ export default function DemoPage() {
       <section className="heroPanel demoHero">
         <div>
           <p className="eyebrow">System reveal demo</p>
-          <h1>PIKO Protocol with World ID.</h1>
+          <h1>PIKO Protocol — System Reveal.</h1>
           <p className="heroCopy">
-            Frontend, API, AI, and Solana are all visible in one judge-facing console, with World ID sitting in the
-            middle of the reward path.
+            Frontend, API, AI, and Solana are all visible in one judge-facing console, with the identity layer sitting
+            in the middle of the reward path.
           </p>
         </div>
 
@@ -946,7 +947,7 @@ export default function DemoPage() {
               <h2>Execution flow</h2>
             </div>
             <ProtocolBadge tone={worldVerification?.worldVerified ? "good" : "warn"}>
-              {worldVerification?.worldVerified ? "Human verified" : "Waiting for World ID"}
+              {worldVerification?.worldVerified ? "Human verified" : "Identity pending"}
             </ProtocolBadge>
           </div>
 

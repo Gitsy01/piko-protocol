@@ -21,24 +21,24 @@ const body = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://piko-protocol.app"),
   applicationName: "PIKO Protocol",
-  title: "PIKO Protocol | Real-World Programmable Incentives",
+  title: "PIKO Protocol | Contributor Intelligence and On-Chain Reputation",
   description:
-    "Programmable merchant incentives on Solana. Verify identity, payment, and location, then settle rewards with visible anti-cheat receipts.",
-  keywords: ["Solana", "Solana Pay", "programmable incentives", "merchant rewards", "PIKO Protocol", "web3", "PWA", "location verification"],
+    "AI-powered contributor intelligence and verifiable on-chain reputation infrastructure for decentralized communities.",
+  keywords: ["Solana", "Solana Pay", "contributor intelligence", "on-chain reputation", "community rewards", "PIKO Protocol", "web3", "PWA"],
   authors: [{ name: "PIKO Protocol" }],
   icons: {
     icon: "/icons/icon-192.svg",
     apple: "/icons/icon-192.svg",
   },
   openGraph: {
-    title: "PIKO Protocol | Real-World Programmable Incentives",
-    description: "Merchant-funded incentives with identity, payment, location, AI fraud scoring, and on-chain settlement.",
+    title: "PIKO Protocol | Contributor Intelligence and On-Chain Reputation",
+    description: "AI-powered contributor intelligence with visible verification signals and on-chain proof artifacts.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PIKO Protocol | Real-World Programmable Incentives",
-    description: "Programmable merchant incentives with visible verification, AI scoring, and on-chain proofs.",
+    title: "PIKO Protocol | Contributor Intelligence and On-Chain Reputation",
+    description: "Verifiable on-chain reputation infrastructure for decentralized communities.",
   },
 };
 

@@ -350,7 +350,7 @@ export const demoQuests: QuestDetail[] = [
     requirements: [
       { id: "req-1", label: "Tap the merchant pin", done: true, hint: "Single scripted location" },
       { id: "req-2", label: "Claim the incentive flow", done: false, hint: "One tap in demo mode" },
-      { id: "req-3", label: "Confirm the mock payment", done: false, hint: "Repeatable for judges" },
+      { id: "req-3", label: "Run the controlled scoring event", done: false, hint: "Repeatable for judges" },
       { id: "req-4", label: "Let AI verify and settle 5 PIKO", done: false, hint: "Visible decision panel" },
     ],
     statusSteps: [

@@ -50,7 +50,7 @@ export function AppShell({ children }: PropsWithChildren) {
           <span className="brandBeacon" aria-hidden="true" />
           <span>
             <span className="brandMark">PIKO Protocol</span>
-            <span className="brandTag">{demoMode ? "Focused demo mode" : "Real-world programmable incentives"}</span>
+            <span className="brandTag">{demoMode ? "Focused demo mode" : "Contributor intelligence infrastructure"}</span>
           </span>
         </Link>
 

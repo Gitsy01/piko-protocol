@@ -44,10 +44,10 @@ export function DemoKioskHome() {
       <section className="demoKioskHero">
         <div className="demoKioskCopy">
           <p className="eyebrow">PIKO Protocol</p>
-          <h1>Earn rewards for real-world actions instantly on-chain.</h1>
+          <h1>AI-powered contributor intelligence for on-chain communities.</h1>
           <p className="heroCopy">
-            This is the judge path. Open the map, tap the one merchant pin, confirm the payment,
-            and watch a verified 5 PIKO incentive settle with a visible decision receipt.
+            This controlled judge path shows the scoring narrative. Use the live Phantom path separately
+            to record wallet approval, devnet settlement, and Explorer verification.
           </p>
           <div className="demoKioskFlow">
             <div className="demoKioskFlowStep">
@@ -60,7 +60,7 @@ export function DemoKioskHome() {
             </div>
             <div className="demoKioskFlowStep">
               <span>3</span>
-              <strong>Confirm payment</strong>
+              <strong>Run scoring</strong>
             </div>
             <div className="demoKioskFlowStep">
               <span>4</span>
@@ -155,7 +155,7 @@ export function DemoKioskHome() {
               <p className="eyebrow">Step 1</p>
               <h2>Tap the only merchant pin on the map</h2>
               <p className="supportText">
-                No exploration, no alternate routes, no playful detours. The demo starts when Cafe Bloom is selected.
+                The controlled route starts when Cafe Bloom is selected. Record the live Phantom flow separately.
               </p>
             </div>
           )}

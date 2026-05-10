@@ -20,7 +20,6 @@ import {
   RewardOutput,
 } from "./agents/reward.agent";
 import { configureAgentCache } from "./cache";
-import { OpenRouterClient, callAI } from "./llm/openrouter.client";
 
 export class AgentCouncil {
   private readonly merchantAgent = new MerchantAgent();
@@ -96,4 +95,3 @@ export { RewardAgent, RewardInput, RewardOutput } from "./agents/reward.agent";
 export { FraudAgent, FraudInput, FraudOutput } from "./agents/fraud.agent";
 export { GrowthAgent, GrowthInput, GrowthOutput } from "./agents/growth.agent";
 export { configureAgentCache } from "./cache";
-export { OpenRouterClient, callAI };

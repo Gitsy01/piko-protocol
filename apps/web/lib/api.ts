@@ -16,7 +16,12 @@ import {
   UserProfile,
 } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const PRODUCTION_API_URL = "https://piko-protocol-production.up.railway.app";
+const LOCAL_API_URL = "http://localhost:3001";
+const RAW_API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production" ? PRODUCTION_API_URL : LOCAL_API_URL);
+const API_URL = RAW_API_URL.replace(/\/+$/, "");
 const FALLBACK_MERCHANTS = demoMerchants.slice(0, 5);
 const FALLBACK_RECIPIENT = "GvHeQ9NfL7KPLWjXrbgNqE6W5gK4Tz6M3fVhHq7w8Y9Z";
 const DEMO_CLUSTER_CENTER = demoMerchants.reduce(

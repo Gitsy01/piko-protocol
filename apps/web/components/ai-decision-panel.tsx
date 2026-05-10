@@ -145,7 +145,7 @@ export function AIDecisionPanel({
           <span className="aiMetricLabel">Human Check</span>
           <div className="aiMetricValue">
             <span className={`aiVerifyBadge ${worldVerified ? "verified" : "unverified"}`}>
-              {worldVerified ? "World ID verified" : "Verification pending"}
+              {worldVerified ? "Human signal verified" : "Signal pending"}
             </span>
           </div>
         </div>

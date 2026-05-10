@@ -11,6 +11,10 @@ export function resolveAnchorWalletPath() {
 }
 
 export function loadAnchorWalletKeypair() {
+  if (env.ANCHOR_WALLET_SECRET) {
+    return Keypair.fromSecretKey(Uint8Array.from(parseAnchorWalletSecret(env.ANCHOR_WALLET_SECRET)));
+  }
+
   const walletPath = resolveAnchorWalletPath();
 
   if (!fs.existsSync(walletPath)) {
@@ -22,4 +26,14 @@ export function loadAnchorWalletKeypair() {
 
   const secret = JSON.parse(fs.readFileSync(walletPath, "utf8")) as number[];
   return Keypair.fromSecretKey(Uint8Array.from(secret));
+}
+
+function parseAnchorWalletSecret(value: string) {
+  const trimmed = value.trim();
+
+  if (trimmed.startsWith("[")) {
+    return JSON.parse(trimmed) as number[];
+  }
+
+  return JSON.parse(Buffer.from(trimmed, "base64").toString("utf8")) as number[];
 }

@@ -35,7 +35,7 @@ export function VerificationGate({
         <div className="verificationGateIcon" aria-hidden="true">Shield</div>
         <div className="verificationGateContent">
           <strong>Human Verified</strong>
-          <span className="supportText">World ID proof accepted. The settlement path is now available.</span>
+          <span className="supportText">Human-verification signal accepted. The settlement path is now available.</span>
         </div>
         <span className="verificationGateBadge verified">Verified</span>
       </div>
@@ -48,9 +48,8 @@ export function VerificationGate({
         <div className="verificationGateIcon" aria-hidden="true">Lock</div>
         <h3>Verification Required</h3>
         <p>
-          World ID verification is required before rewards can be claimed.
-          This prevents bots from farming incentives and ensures every reward
-          goes to a real human.
+          A human-verification signal is required before rewards can be claimed.
+          This helps reduce bot farming and gives each reward a human-verification signal.
         </p>
 
         <div className="verificationGateStatus">
@@ -64,12 +63,11 @@ export function VerificationGate({
           disabled={pending}
           onClick={() => void onVerify(buildDemoProof(wallet, sessionId))}
         >
-          {pending ? "Verifying human..." : "Verify with World ID"}
+          {pending ? "Verifying signal..." : "Verify human signal"}
         </button>
 
         <p className="verificationGateNote">
-          In production, this uses the World ID SDK with biometric proof.
-          For the demo, we simulate the proof payload.
+          The demo stores a World ID-style proof payload. Production SDK verification is future work.
         </p>
       </div>
     </div>

@@ -1,0 +1,28 @@
+{
+  "name": "Contributor Proof NFT",
+  "symbol": "CPN",
+  "description": "Proof of verified community contribution",
+  "image": "https://piko-protocol-web.vercel.app/nft/contributor-proof.svg",
+  "attributes": [
+    {
+      "trait_type": "Contribution Score",
+      "value": 95
+    },
+    {
+      "trait_type": "Tier",
+      "value": "Gold"
+    },
+    {
+      "trait_type": "Proof Type",
+      "value": "Verified Community Contribution"
+    },
+    {
+      "trait_type": "Protocol",
+      "value": "PIKO"
+    }
+  ],
+  "properties": {
+    "category": "proof-of-contribution",
+    "protocol": "piko"
+  }
+}

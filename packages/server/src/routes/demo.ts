@@ -10,6 +10,7 @@ import { HttpError, getErrorMessage, getErrorStatus, parseWithSchema } from "../
 import { getPikoMintAuthorityConfigError } from "../lib/mintAuthorityWallet";
 import { mintPiko } from "../lib/pikoMinter";
 import { decimalToBaseUnits } from "../lib/tokenMath";
+import { resolveAnchorWalletPath } from "../lib/anchorWallet";
 import { mintRewardNFT } from "../services/nftService";
 import { RewardService } from "../services/rewardService";
 import { questService } from "../services";
@@ -39,7 +40,7 @@ const demoRouter = Router();
 const agentCouncil = new AgentCouncil();
 
 const DEMO_MERCHANT_WALLET = "9xQeWvG816bUx9EPu4wQfCj4n8k3B7hRz7D2mM8tLQ5";
-const DEMO_USER_WALLET = "7YnaQm9GdrM9C8pQ2tQY6xH8q4vM2zK6fV9Lr3JbW8P";
+const DEMO_USER_WALLET = "GmaDrppBC7P5ARKV8g3djiwP89vz1jLK23V2GBjuAEGB";
 const DEMO_REFERENCE = "AKnL4NNf3DGWZJS6cPknBuEGnVsV4A4m5tgebLHaRSZ9";
 const DEMO_DEFAULTS = {
   title: "Visit the signal zone",
@@ -123,11 +124,11 @@ function requireDemoAccess(req: Request) {
 }
 
 function walletPathExists() {
-  const walletPath = path.isAbsolute(env.ANCHOR_WALLET)
-    ? env.ANCHOR_WALLET
-    : path.resolve(process.cwd(), env.ANCHOR_WALLET);
+  if (env.ANCHOR_WALLET_SECRET) {
+    return true;
+  }
 
-  return fs.existsSync(walletPath);
+  return fs.existsSync(resolveAnchorWalletPath());
 }
 
 function resolveCapabilities() {

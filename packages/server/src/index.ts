@@ -9,6 +9,7 @@ import { Server as SocketIO } from "socket.io";
 
 import "./config/ai";
 import { env } from "./config/env";
+import { log } from "./config/logger";
 import { assertPikoMintDecimals } from "./config/pikoMint";
 import { merchantRouter } from "./routes/merchants";
 import { questRouter } from "./routes/quests";
@@ -66,7 +67,7 @@ function startServer() {
   // Bind to 0.0.0.0 so Railway / Docker healthchecks can reach the server
   const HOST = "0.0.0.0";
   server.listen(PORT, HOST, () => {
-    console.log(`PIKO Protocol API listening on http://${HOST}:${PORT}`);
+    log("info", `PIKO Protocol API listening on http://${HOST}:${PORT}`);
 
     void assertPikoMintDecimals().catch((error) => {
       console.warn("PIKO mint decimal check failed (non-fatal):", error);

@@ -10,7 +10,9 @@ export function useDemoMode() {
     setQueryEnabled(hasDemoModeQuery(new URLSearchParams(window.location.search)));
   }, []);
 
-  return DEMO_MODE_ENABLED || queryEnabled;
+  const envEnabled = process.env.NODE_ENV !== "production" && DEMO_MODE_ENABLED;
+
+  return envEnabled || queryEnabled;
 }
 
 export function useDemoHref(href: string) {

@@ -2,6 +2,7 @@ import { Metaplex, keypairIdentity } from "@metaplex-foundation/js";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { env } from "../config/env";
 import { HttpError } from "../config/http";
+import { log } from "../config/logger";
 import { loadAnchorWalletKeypair, resolveAnchorWalletPath } from "../lib/anchorWallet";
 
 let metaplex: Metaplex | null = null;
@@ -124,7 +125,7 @@ export async function mintRewardNFT(
       isCollection: false,
     });
 
-    console.log(`NFT minted: ${nft.address.toBase58()}`);
+    log("info", `NFT minted: ${nft.address.toBase58()}`);
 
     return {
       nftMint: nft.address.toBase58(),
@@ -153,6 +154,11 @@ function buildMetadataUri(payload: {
     protocol: string;
   };
 }) {
+  const hostedMetadataUri = buildHostedMetadataUri(payload);
+  if (hostedMetadataUri) {
+    return hostedMetadataUri;
+  }
+
   const metadataJson = {
     name: payload.name,
     symbol: env.NFT_REWARD_SYMBOL,
@@ -163,6 +169,62 @@ function buildMetadataUri(payload: {
   };
 
   return `data:application/json;base64,${Buffer.from(JSON.stringify(metadataJson)).toString("base64")}`;
+}
+
+function buildHostedMetadataUri(payload: {
+  name: string;
+  attributes: Array<{ trait_type: string; value: string }>;
+}) {
+  const baseUri = env.NFT_REWARD_METADATA_BASE_URI.trim();
+  const template = env.NFT_REWARD_METADATA_TEMPLATE.trim();
+
+  if (!baseUri) {
+    return "";
+  }
+
+  if (!template && /\.json(?:[?#].*)?$/i.test(baseUri)) {
+    return baseUri;
+  }
+
+  const metadataPath = template
+    ? replaceMetadataTemplate(template, payload)
+    : "contributor.json";
+
+  return joinUri(baseUri, metadataPath);
+}
+
+function replaceMetadataTemplate(
+  template: string,
+  payload: {
+    name: string;
+    attributes: Array<{ trait_type: string; value: string }>;
+  },
+) {
+  const attr = (traitType: string) =>
+    payload.attributes.find((item) => item.trait_type === traitType)?.value ?? "";
+
+  const replacements: Record<string, string> = {
+    name: payload.name,
+    symbol: env.NFT_REWARD_SYMBOL,
+    merchant: attr("merchant"),
+    quest: attr("quest"),
+    visit_date: attr("visit_date"),
+    fraud_score: attr("fraud_score"),
+    reward_multiplier: attr("reward_multiplier"),
+    payment_verified: attr("payment_verified"),
+    location_verified: attr("location_verified"),
+    world_id_verified: attr("world_id_verified"),
+  };
+
+  return template.replace(/\{([a-zA-Z0-9_]+)\}/g, (_match, key: string) =>
+    encodeURIComponent(replacements[key] ?? ""),
+  );
+}
+
+function joinUri(baseUri: string, metadataPath: string) {
+  const cleanBase = baseUri.replace(/\/+$/, "");
+  const cleanPath = metadataPath.replace(/^\/+/, "");
+  return `${cleanBase}/${cleanPath}`;
 }
 
 export async function getNFTMetadata(nftMint: string) {

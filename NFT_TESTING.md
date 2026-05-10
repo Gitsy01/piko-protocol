@@ -6,10 +6,13 @@
 
 ```bash
 NFT_REWARDS_ENABLED=true
-NFT_REWARD_METADATA_BASE_URI=https://example.com/metadata/
-NFT_REWARD_SYMBOL=PIKO
+NFT_REWARD_METADATA_BASE_URI=https://piko-protocol-web.vercel.app/metadata/
+NFT_REWARD_METADATA_TEMPLATE=contributor.json
+NFT_REWARD_IMAGE_URL=https://piko-protocol-web.vercel.app/nft/contributor-proof.svg
+NFT_REWARD_SYMBOL=CPN
 SOLANA_RPC_URL=https://api.devnet.solana.com
 ANCHOR_WALLET=./wallet/dev-wallet.json
+# Railway/Vercel-style production deploys should use ANCHOR_WALLET_SECRET instead of a file path.
 PIKO_MINT_AUTHORITY_WALLET=/secure/path/mint-authority.json
 ```
 
@@ -176,7 +179,13 @@ WHERE "userId" = (
 ### NFT Minting Failed: Invalid Metadata URI
 
 - Set `NFT_REWARD_METADATA_BASE_URI` to a valid IPFS or CDN URL.
-- Temporary fallback: `https://arweave.net/`
+- If using the bundled static metadata, set `NFT_REWARD_METADATA_TEMPLATE=contributor.json`.
+- Temporary fallback: leave `NFT_REWARD_METADATA_BASE_URI` empty to use the local data URI metadata generator.
+
+### Metadata Changed but Explorer Still Shows the Old NFT
+
+- Mint a new NFT after changing metadata URLs. The metadata URI is embedded at mint time.
+- Existing NFTs only update if their Metaplex metadata is mutable and the update authority explicitly changes the on-chain URI.
 
 ### Quest Completion Blocked by NFT Error
 

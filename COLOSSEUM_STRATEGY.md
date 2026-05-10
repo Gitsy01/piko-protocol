@@ -14,20 +14,20 @@ Judges do not care about PDAs in isolation. They care about three questions:
 
 This strategy doc focuses on those three pillars.
 
-## Pillar 1: Anti-Cheat Is the Moat
+## Pillar 1: Validation Architecture Is the Moat
 
 ### Why This Matters
 
-Most location-based reward systems fail the same way: bots drain the pool. PIKO already has a real multi-layer anti-cheat design, which is one of the strongest differentiators in the project.
+Most location-based reward systems fail the same way: bots drain the pool. PIKO already has a real multi-layer validation architecture, which is one of the strongest differentiators in the project.
 
 ### What To Sell Hard
 
 ```text
-PIKO Anti-Cheat Stack
----------------------
+PIKO Validation Architecture
+----------------------------
 
 Layer 1: Identity Gate
-- World ID (1 human = 1 wallet)
+- Identity-layer ready (optional World ID integration path)
 
 Layer 2: Payment Proof
 - Solana Pay signature verification
@@ -54,14 +54,14 @@ Layer 5: Economic Guardrails
 
 Demo talking point:
 
-> We do not just detect fraud. We have five independent layers an attacker must beat simultaneously. Even if they spoof GPS, they still need a real Solana Pay transaction to the correct merchant, a verified World ID, and an AI fraud score under 60.
+> We do not just detect fraud. We have five independent validation layers an attacker must beat simultaneously. Even if they spoof GPS, they still need a real Solana Pay transaction to the correct merchant, a human-verification identity signal, and an AI fraud score under 60.
 
 ### Demo Card To Show Judges
 
-This is the anti-cheat moment that makes the product feel real:
+This is the validation moment that makes the product feel real:
 
 ```text
-[OK] Identity: World ID verified
+[OK] Identity: Human-verification signal recorded
 [OK] Payment: 0.05 SOL -> Merchant (confirmed)
 [OK] Location: 47m from merchant (GPS accuracy: 12m)
 [OK] Fraud Score: 8/100 - LOW RISK
@@ -74,8 +74,8 @@ That card says the system is infrastructure, not a toy.
 
 | Gap | Why It Matters | Recommended Fix |
 | --- | --- | --- |
-| World ID is stubbed | Sybil defense looks incomplete | Wire the real flow or simulate it with realistic nullifier storage |
-| Impossible travel is not visible in the demo | A full anti-cheat layer is effectively hidden | Track prior claim location and pass it into fraud review |
+| World ID is a demo integration path | Identity layer is not production-complete | Acknowledge prototype status; simulate with realistic nullifier storage |
+| Impossible travel is not visible in the demo | A full validation layer is effectively hidden | Track prior claim location and pass it into fraud review |
 | Fraud score is not visible in the UI | Judges cannot see the AI enforcement working | Surface `fraudScore`, `fraudFlags`, and `aiSummary` in the reward completion UI |
 
 ### Concrete Code Change: Previous Location Tracking
@@ -290,7 +290,7 @@ Proof Layer
 - Metaplex proof data
 
 Key differentiators
-- 5-layer anti-cheat
+- 5-layer validation architecture
 - AI-driven dynamic pricing
 - Composable proofs
 - Deterministic fallback paths
@@ -303,10 +303,10 @@ Key differentiators
 | Day | Task | Impact |
 | --- | --- | --- |
 | 1 | Wire `prevLat`, `prevLng`, and `timeDelta` into fraud calls | Activates impossible travel detection |
-| 2 | Surface fraud score and AI reasoning in the completion UI | Judges can see anti-cheat working |
+| 2 | Surface fraud score and AI reasoning in the completion UI | Judges can see validation working |
 | 2 | Add budget guard and multiplier state to responses | Judges can see economic control |
 | 3 | Add structured NFT metadata | Makes proof NFTs meaningful |
-| 4 | Fix or credibly simulate World ID | Makes sybil defense believable |
+| 4 | Demonstrate identity-layer integration path | Makes identity architecture believable |
 | 5 | Record the end-to-end demo video | Converts technical work into submission strength |
 
 ### Week 2: Polish the Narrative
@@ -329,14 +329,14 @@ Key differentiators
 ## The Three Sentences That Win
 
 1. PIKO turns real-world merchant visits into verifiable on-chain proofs. Every visit becomes a composable Metaplex NFT with fraud score, payment verification, and location attestation inside the metadata.
-2. PIKO uses five layers of anti-cheat before any reward is issued: identity, payment proof, GPS validation, AI behavioral scoring, and economic guardrails, so merchants can fund campaigns without bots draining them.
+2. PIKO uses five validation layers before any reward is issued: identity signal, payment proof, GPS validation, AI behavioral scoring, and economic guardrails, so merchants can fund campaigns without bots draining them.
 3. The AI does not just block fraud. It dynamically prices each reward based on traffic, timing, budget, and user history, which gives merchants surge pricing for foot traffic instead of static coupons.
 
 ## Recommended Submission Positioning
 
 Lead the submission with these three proof points:
 
-- Anti-cheat moat
+- Validation architecture moat
 - Merchant-funded economic control
 - Metaplex-powered composable proofs
 

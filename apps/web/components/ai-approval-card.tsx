@@ -50,7 +50,7 @@ export function AIApprovalCard({
       },
       {
         id: "human",
-        label: "Human verified (World ID)",
+        label: "Human verified (identity signal)",
         passed: settlement.worldVerified,
       },
       {

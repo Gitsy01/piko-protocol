@@ -1,7 +1,7 @@
 const FRIENDLY_MESSAGE_RULES: Array<{ pattern: RegExp; message: string }> = [
   {
     pattern: /world id verification required/i,
-    message: "Verify with World ID before trying to claim this incentive.",
+    message: "Complete identity verification before trying to claim this incentive.",
   },
   {
     pattern: /gps accuracy is required/i,

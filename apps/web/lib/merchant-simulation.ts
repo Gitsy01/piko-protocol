@@ -64,7 +64,7 @@ export type MerchantEconomics = {
   cacInr: number;                // Cost-per-acquisition in ₹
   lifetimeValueInr: number;      // estimated LTV per repeat customer
   networkRoiX: number;           // revenue ÷ PIKO budget spend (as multiplier)
-  fraudRejectedCount: number;    // transactions blocked by anti-cheat
+  fraudRejectedCount: number;    // transactions held by risk policy
   fraudSavedPiko: number;        // PIKO that would have leaked if no fraud guard
 };
 
@@ -299,7 +299,7 @@ export function computeEconomics(transactions: TransactionRecord[], options: Eco
   // ROI: revenue generated per ₹1 of reward spend
   const networkRoiX = rewardBudgetInr > 0 ? +(revenueInr / rewardBudgetInr).toFixed(1) : 0;
 
-  // Fraud savings: PIKO that would have leaked without the anti-cheat guard
+  // Fraud savings: PIKO that would have leaked without the risk guard
   const fraudSavedPiko = +(rejected.reduce((sum, tx) => sum + (tx.amountInr * 0.08 * 0.034), 0)).toFixed(2);
 
   // Budget exhaustion projection

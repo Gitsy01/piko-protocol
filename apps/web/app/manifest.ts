@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "PIKO Protocol",
     short_name: "PIKO",
-    description: "Real-world programmable incentives with visible verification and on-chain settlement.",
+    description: "Contributor intelligence and verifiable on-chain reputation for decentralized communities.",
     start_url: "/",
     display: "standalone",
     background_color: "#05050b",

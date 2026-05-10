@@ -23,6 +23,7 @@ const envSchema = z.object({
   SOLANA_RPC_URL: z.string().url().default("https://api.devnet.solana.com"),
   SOLANA_WS_URL: z.string().url().default("wss://api.devnet.solana.com"),
   ANCHOR_WALLET: z.string().min(1).default("./wallet/dev-wallet.json"),
+  ANCHOR_WALLET_SECRET: z.string().trim().default(""),
   PIKO_MINT_AUTHORITY_WALLET: z.string().trim().default(""),
   PIKO_MINT_ADDRESS: z.string().trim().default(""),
   PIKO_DECIMALS: z.coerce.number().int().nonnegative().max(18).default(9),

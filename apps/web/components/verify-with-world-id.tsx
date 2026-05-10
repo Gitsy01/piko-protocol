@@ -36,7 +36,7 @@ export function VerifyWithWorldID({
       disabled={disabled || pending}
       onClick={() => void onVerify(buildDemoProof(wallet, sessionId))}
     >
-      {pending ? "Verifying human..." : "Verify with World ID"}
+      {pending ? "Verifying human..." : "Verify human signal"}
     </button>
   );
 }

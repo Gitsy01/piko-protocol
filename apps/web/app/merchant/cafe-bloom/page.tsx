@@ -280,7 +280,7 @@ function TransactionFeed({ transactions }: { transactions: TransactionRecord[] }
               <div className="merchantTxRejectExpanded">
                 <div className="merchantTxRejectHeader">
                   <span className="merchantTxRejectIcon">✕</span>
-                  <span className="merchantTxRejectTitle">Rejected by anti-cheat · Fraud score {tx.fraudScore}/100</span>
+                  <span className="merchantTxRejectTitle">Rejected by risk policy · Fraud score {tx.fraudScore}/100</span>
                 </div>
                 {tx.rejectReasons?.map((reason, i) => (
                   <div key={i} className="merchantTxRejectFlag">
@@ -408,7 +408,7 @@ function EconomicsDashboard({ transactions }: { transactions: TransactionRecord[
           </div>
           <div className="merchantEconRoiCard danger">
             <span className="merchantEconRoiValue">{economics.fraudSavedPiko} PIKO</span>
-            <span className="merchantEconRoiLabel">Saved by anti-cheat guard</span>
+            <span className="merchantEconRoiLabel">Saved by risk guard</span>
           </div>
         </div>
       </div>

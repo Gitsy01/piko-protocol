@@ -4837,10 +4837,15 @@ h1, h2, h3 {
 /* --- AI Approval Card --- */
 .aiApprovalCard {
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: min(780px, calc(100vw - 24px));
+  max-height: calc(100dvh - 112px);
   padding: 32px;
   border-radius: var(--radius-xl);
   text-align: center;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .aiApprovalCard.approved {
@@ -6212,9 +6217,16 @@ h1, h2, h3 {
 
 /* --- AI Approval Actions (reward screen) --- */
 .aiApprovalActions {
+  position: sticky;
+  bottom: 0;
   display: grid;
   gap: 10px;
-  margin-top: 8px;
+  margin: 8px -16px -10px;
+  padding: 12px 16px 10px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: linear-gradient(180deg, rgba(10, 10, 18, 0.72), rgba(10, 10, 18, 0.96));
+  backdrop-filter: blur(14px);
+  z-index: 4;
 }
 
 .aiApprovalActions .demoCta {

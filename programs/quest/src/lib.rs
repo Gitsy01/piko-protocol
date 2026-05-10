@@ -109,9 +109,11 @@ pub mod quest_program {
             claim.bump = ctx.bumps.claim;
         }
 
-        // Increment claim count
         let quest = &mut ctx.accounts.quest;
-        quest.claimed_count += 1;
+        quest.claimed_count = quest
+            .claimed_count
+            .checked_add(1)
+            .ok_or(QuestError::MathOverflow)?;
 
         emit!(QuestClaimed {
             quest: quest_key,
@@ -260,4 +262,6 @@ pub enum QuestError {
     MerchantWalletMismatch,
     #[msg("Payment amount is below minimum spend")]
     InsufficientPayment,
+    #[msg("Math overflow")]
+    MathOverflow,
 }

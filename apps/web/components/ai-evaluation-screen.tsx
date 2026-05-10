@@ -182,6 +182,13 @@ export function AIEvaluationScreen() {
           </div>
           <h2>AI is verifying the payment</h2>
           <p>Checking fraud risk and reward logic...</p>
+          <button
+            className="ghostButton"
+            type="button"
+            onClick={() => dispatch({ type: "EVALUATION_DONE" })}
+          >
+            Continue to reward
+          </button>
         </div>
       ) : null}
 
@@ -287,7 +294,7 @@ export function AIEvaluationScreen() {
             <span className="aiEvalMetricLabel">Human Check</span>
             <div className="aiEvalMetricValue">
               <span className={`aiEvalVerifyBadge ${evaluation.worldVerified ? "verified" : "unverified"}`}>
-                {evaluation.worldVerified ? "World ID verified" : "Verification pending"}
+                {evaluation.worldVerified ? "Human signal verified" : "Signal pending"}
               </span>
             </div>
           </div>
