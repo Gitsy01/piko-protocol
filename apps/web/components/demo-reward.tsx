@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { DecisionReceipt } from "@/components/DecisionReceipt";
 import { useDemoContext } from "@/providers/demo-context";
 
@@ -34,34 +34,10 @@ export function DemoReward() {
     return () => clearTimeout(timer);
   }, [revealStep]);
 
-  const particles = useMemo(
-    () =>
-      isApproved
-        ? Array.from({ length: 24 }, (_, index) => ({
-            id: index,
-            style: {
-              ["--particle-left" as string]: `${Math.random() * 100}%`,
-              ["--particle-delay" as string]: `${Math.random() * 1.2}s`,
-              ["--particle-color" as string]:
-                index % 4 === 0
-                  ? "var(--solana-green)"
-                  : index % 4 === 1
-                    ? "var(--brand)"
-                    : index % 4 === 2
-                      ? "var(--solana-purple)"
-                      : "#FFD700",
-            } as CSSProperties,
-          }))
-        : [],
-    [isApproved]
-  );
-
   const showReward = revealStep >= 1;
   const showExplorer = revealStep >= 2;
   const earnedAmount = rewardResult?.rewardAmount ?? quest.rewardAmount;
   const earnedToken = rewardResult?.rewardToken ?? quest.rewardToken;
-  const originalReward = aiEvaluation?.originalReward ?? quest.rewardAmount;
-  const rewardMultiplier = aiEvaluation?.rewardMultiplier ?? 1;
 
   return (
     <div
@@ -70,46 +46,29 @@ export function DemoReward() {
       role="status"
       aria-live="polite"
     >
-      {isApproved && showReward ? (
-        <div className="aiApprovalParticles" aria-hidden="true">
-          {particles.map((particle) => (
-            <div key={particle.id} className="aiApprovalParticle" style={particle.style} />
-          ))}
-        </div>
-      ) : null}
-
       <div className="aiApprovalHeader">
         <span className="aiApprovalIcon" aria-hidden="true">
           {isApproved ? "OK" : "NO"}
         </span>
         <h2 className="aiApprovalTitle">
-          {isApproved ? `${earnedAmount.toFixed(2)} ${earnedToken} settled` : "Reward rejected"}
+          {isApproved ? "Contribution Verified" : "Reward rejected"}
         </h2>
+        <p className="aiApprovalSubtitle">
+          {isApproved
+            ? `${earnedAmount.toFixed(2)} ${earnedToken} settled and proof NFT minted.`
+            : "The claim did not pass validation."}
+        </p>
       </div>
 
       {showReward && isApproved ? (
         <div className="demoRewardMoment">
           <p className="eyebrow">Decision Receipt</p>
-          <strong>The scoring system explains why this reward cleared</strong>
-          <span>{quest.merchant.name} payment, location, identity, and travel signals all passed before settlement.</span>
+          <strong>System-level verification completed</strong>
+          <span>{quest.merchant.name} passed payment, location, identity, and fraud checks before settlement.</span>
         </div>
       ) : null}
 
       {showReward && decisionReceipt ? <DecisionReceipt data={decisionReceipt} /> : null}
-
-      {showReward ? (
-        <div className={`aiRewardReveal ${isApproved ? "show" : ""}`}>
-          <div className="aiRewardRevealRow">
-            <span className="aiRewardLabel">Reward</span>
-            <span className="aiRewardOriginal">{originalReward.toFixed(2)}</span>
-            <span className="aiRewardArrow" aria-hidden="true">TO</span>
-            <span className="aiRewardBoosted">
-              {earnedAmount.toFixed(2)} {earnedToken}
-            </span>
-            {rewardMultiplier > 1 ? <span className="aiRewardBoostTag">AI boosted</span> : null}
-          </div>
-        </div>
-      ) : null}
 
       {showExplorer ? (
         <div className="aiApprovalBlockchain">
@@ -153,12 +112,6 @@ export function DemoReward() {
         </div>
       ) : null}
 
-      {showExplorer && aiEvaluation?.aiSummary ? (
-        <div className="aiApprovalSummary">
-          <span className="aiMetricLabel">AI Summary</span>
-          <p>{aiEvaluation.aiSummary}</p>
-        </div>
-      ) : null}
     </div>
   );
 }

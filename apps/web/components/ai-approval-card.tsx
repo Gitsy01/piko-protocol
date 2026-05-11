@@ -15,9 +15,24 @@ type ChecklistItem = {
   passed: boolean;
 };
 
+const PROGRAM_PROOFS = [
+  {
+    label: "Merchant Registry Program",
+    programId: "3GyfAzucGoL1FFpkhpCm3sRjTCjLxPyeFLp4vayw35GH",
+  },
+  {
+    label: "Quest Program",
+    programId: "21qTx6xMKjy4v23BbfGvM1mSKvkk3bNVHvgSnXZEMcpC",
+  },
+] as const;
+
 function getExplorerUrl(signature: string | null, mode: string) {
   if (!signature || mode !== "live") return null;
   return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+}
+
+function getProgramExplorerUrl(programId: string) {
+  return `https://explorer.solana.com/address/${programId}?cluster=devnet`;
 }
 
 function truncateSignature(signature: string | null, chars = 8) {
@@ -33,8 +48,12 @@ export function AIApprovalCard({
 }: AIApprovalCardProps) {
   const [revealStep, setRevealStep] = useState(0);
   const isApproved = settlement.decision === "APPROVED";
-  const explorerUrl = getExplorerUrl(blockchain.rewardTx, blockchain.rewardTxMode);
-  const nftExplorerUrl = getExplorerUrl(blockchain.nftMint, blockchain.nftMode);
+  const rewardExplorerUrl = getExplorerUrl(blockchain.rewardTx, blockchain.rewardTxMode);
+  const nftTxExplorerUrl = getExplorerUrl(blockchain.nftTxSignature, blockchain.nftMode);
+  const explorerUrl = rewardExplorerUrl ?? nftTxExplorerUrl;
+  const explorerLabel = rewardExplorerUrl ? "View reward transaction" : "View proof NFT transaction";
+  const displayedTxSignature = blockchain.rewardTx ?? blockchain.nftTxSignature;
+  const displayedTxMode = blockchain.rewardTxMode === "live" ? blockchain.rewardTxMode : blockchain.nftMode;
 
   const checklist: ChecklistItem[] = useMemo(
     () => [
@@ -118,9 +137,12 @@ export function AIApprovalCard({
         <span className="aiApprovalIcon" aria-hidden="true">
           {isApproved ? "OK" : "NO"}
         </span>
-        <h2 className="aiApprovalTitle">
-          {isApproved ? "AI approved reward" : "AI rejected claim"}
-        </h2>
+        <div>
+          <h2 className="aiApprovalTitle">
+            {isApproved ? "AI approved reward" : "AI rejected claim"}
+          </h2>
+          <p className="aiSignerDisclosure">On-chain demo proof is executed by the server-side demo signer.</p>
+        </div>
       </div>
 
       <div className="aiApprovalChecklist">
@@ -151,7 +173,7 @@ export function AIApprovalCard({
               {rewardReadout.adjustedRewardDisplay} {rewardReadout.rewardToken}
             </span>
             {rewardReadout.multiplier > 1 ? (
-              <span className="aiRewardBoostTag">AI boosted</span>
+              <span className="aiRewardBoostTag">Risk-adjusted</span>
             ) : null}
           </div>
         </div>
@@ -161,7 +183,8 @@ export function AIApprovalCard({
         <div className="aiNftReveal">
           <span className="aiNftIcon" aria-hidden="true">NFT</span>
           <div className="aiProofNftCard">
-            <strong>Proof NFT Created</strong>
+            <strong>Proof NFT mint account</strong>
+            <span className="aiSignerBadge">Powered by demo signer</span>
             <span className="aiNftMint">{truncateSignature(blockchain.nftMint)}</span>
             <div className="aiProofNftGrid">
               <div className="aiProofNftAttribute">
@@ -182,11 +205,6 @@ export function AIApprovalCard({
               </div>
             </div>
           </div>
-          {nftExplorerUrl ? (
-            <a className="aiNftLink" href={nftExplorerUrl} target="_blank" rel="noreferrer">
-              View
-            </a>
-          ) : null}
         </div>
       ) : null}
 
@@ -194,19 +212,34 @@ export function AIApprovalCard({
         <div className="aiApprovalBlockchain">
           <div className="aiApprovalBlockchainRow">
             <span>Tx Signature</span>
-            <strong>{truncateSignature(blockchain.txSignature)}</strong>
+            <strong>{truncateSignature(displayedTxSignature)}</strong>
           </div>
           <div className="aiApprovalBlockchainRow">
             <span>Mode</span>
-            <strong className={`aiModeBadge ${blockchain.rewardTxMode}`}>
-              {blockchain.rewardTxMode.toUpperCase()}
+            <strong className={`aiModeBadge ${displayedTxMode}`}>
+              {displayedTxMode.toUpperCase()}
             </strong>
           </div>
           {explorerUrl ? (
             <a className="primaryButton aiExplorerButton" href={explorerUrl} target="_blank" rel="noreferrer">
-              View on Solana Explorer
+              {explorerLabel}
             </a>
           ) : null}
+          <div className="aiProgramProofList">
+            <span className="aiProgramProofTitle">Executable program proof</span>
+            {PROGRAM_PROOFS.map((program) => (
+              <a
+                key={program.programId}
+                className="aiProgramProofLink"
+                href={getProgramExplorerUrl(program.programId)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span>{program.label}</span>
+                <strong>{truncateSignature(program.programId)}</strong>
+              </a>
+            ))}
+          </div>
         </div>
       ) : null}
 

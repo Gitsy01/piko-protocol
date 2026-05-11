@@ -1,34 +1,68 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QuestCard } from "@/components/quest-card";
 import { useMerchantMap } from "@/hooks/use-merchant-map";
 import { getNearbyQuests } from "@/lib/api";
 import { QuestDetail } from "@/lib/types";
+
+const QUEST_REFRESH_DISTANCE_METERS = 120;
+
+function distanceBetweenMeters(
+  left: { lat: number; lng: number },
+  right: { lat: number; lng: number }
+) {
+  const earthRadius = 6_371_000;
+  const latDelta = ((right.lat - left.lat) * Math.PI) / 180;
+  const lngDelta = ((right.lng - left.lng) * Math.PI) / 180;
+  const leftLat = (left.lat * Math.PI) / 180;
+  const rightLat = (right.lat * Math.PI) / 180;
+
+  const a =
+    Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+    Math.cos(leftLat) * Math.cos(rightLat) * Math.sin(lngDelta / 2) * Math.sin(lngDelta / 2);
+
+  return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 export default function QuestIndexPage() {
   const { location, accuracy, locationLabel } = useMerchantMap();
   const [quests, setQuests] = useState<QuestDetail[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const lastFetchLocationRef = useRef<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
+    const lastFetchLocation = lastFetchLocationRef.current;
+    if (
+      lastFetchLocation &&
+      distanceBetweenMeters(lastFetchLocation, location) < QUEST_REFRESH_DISTANCE_METERS
+    ) {
+      return;
+    }
+
     async function loadLiveQuests() {
-      setLoading(true);
+      if (!hasLoadedOnce) {
+        setLoading(true);
+      }
       setError(null);
 
       try {
         const nearbyQuests = await getNearbyQuests(location.lat, location.lng);
 
         if (!cancelled) {
+          lastFetchLocationRef.current = location;
           setQuests(nearbyQuests);
+          setHasLoadedOnce(true);
         }
       } catch (loadError) {
         if (!cancelled) {
           setError(loadError instanceof Error ? loadError.message : "Failed to load live incentives");
           setQuests([]);
+          setHasLoadedOnce(true);
         }
       } finally {
         if (!cancelled) {
@@ -42,7 +76,7 @@ export default function QuestIndexPage() {
     return () => {
       cancelled = true;
     };
-  }, [location.lat, location.lng]);
+  }, [hasLoadedOnce, location]);
 
   return (
     <div className="pageStack questPage">

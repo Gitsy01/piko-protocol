@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AIDecisionPanel } from "@/components/ai-decision-panel";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { VerificationGate } from "@/components/verification-gate";
 import { demoAiPreview } from "@/lib/demo-data";
 import type { DecisionReceiptData } from "@/lib/decision-receipt";
@@ -179,12 +179,19 @@ function buildMockReceipt(input: {
 
 export function DemoPayPanel() {
   const { state, dispatch } = useDemoContext();
+  const { publicKey } = useWallet();
   const { quest, merchant, worldVerified, verifyPending } = state;
   const [submitting, setSubmitting] = useState(false);
+  const [walletError, setWalletError] = useState<string | null>(null);
   const [scenario, setScenario] = useState<DemoScenario>("clean");
-  const scenarioPreview = buildAIEvaluation(quest.rewardToken, true, scenario);
 
   function handleWorldIdVerify() {
+    if (!publicKey) {
+      setWalletError("Connect wallet first.");
+      return;
+    }
+
+    setWalletError(null);
     dispatch({ type: "VERIFY_START" });
     window.setTimeout(() => {
       dispatch({ type: "VERIFY_COMPLETE", payload: { worldVerified: true } });
@@ -192,6 +199,12 @@ export function DemoPayPanel() {
   }
 
   function handleMockPayment() {
+    if (!publicKey) {
+      setWalletError("Connect wallet first.");
+      return;
+    }
+
+    setWalletError(null);
     setSubmitting(true);
 
     window.setTimeout(() => {
@@ -231,7 +244,7 @@ export function DemoPayPanel() {
 
       <div className="demoPayIntro">
         <p className="eyebrow">Step 3</p>
-        <h2>Confirm the payment, then show the AI decision</h2>
+        <h2>Confirm the payment, then validate the claim</h2>
         <p className="supportText">
           Choose a scenario to prove the system enforces policy - not just rewards.
         </p>
@@ -260,11 +273,13 @@ export function DemoPayPanel() {
 
       <VerificationGate
         worldVerified={worldVerified}
-        wallet="controlled-wallet"
+        wallet={publicKey?.toBase58() ?? "wallet-required"}
         sessionId="demo-flow"
         pending={verifyPending}
         onVerify={handleWorldIdVerify}
       />
+
+      {walletError ? <p className="errorText">{walletError}</p> : null}
 
       {worldVerified ? (
         <>
@@ -281,19 +296,9 @@ export function DemoPayPanel() {
             <div className="demoPayStepArrow" aria-hidden="true">DOWN</div>
             <div className="demoPayStep">
               <span className="demoPayStepNum">3</span>
-              <span>AI emits a proof packet and settles <strong>{formatReward(5, quest.rewardToken)}</strong></span>
+              <span>PIKO records validation and settles <strong>{formatReward(5, quest.rewardToken)}</strong></span>
             </div>
           </div>
-
-          <AIDecisionPanel
-            fraudScore={scenarioPreview.fraudScore}
-            fraudFlags={scenarioPreview.fraudFlags}
-            rewardMultiplier={scenarioPreview.rewardMultiplier}
-            rewardReasons={scenarioPreview.rewardReasons}
-            decision={scenarioPreview.decision}
-            worldVerified={worldVerified}
-            compact
-          />
 
           {submitting ? (
             <div className="demoPayStatus" aria-live="polite">
@@ -307,14 +312,14 @@ export function DemoPayPanel() {
             className={`demoCta demoPayNowCta ${submitting ? "loading" : ""}`}
             type="button"
             onClick={handleMockPayment}
-            disabled={submitting}
+            disabled={submitting || !publicKey}
             aria-busy={submitting}
           >
-            {submitting ? "Verifying reward..." : "Run selected scenario"}
+            {submitting ? "Verifying reward..." : publicKey ? "Run selected scenario" : "Connect wallet first"}
           </button>
 
           <p className="demoPayWalletNote">
-            This controlled path is repeatable for judges. Use the live Phantom path to prove wallet approval.
+            Connected wallet gates this controlled judge flow. Demo proof transactions may still use the server-side demo signer.
           </p>
         </>
       ) : null}

@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { formatPiko } from "@depokemongo/common";
 import {
   bootstrapDemoSession,
@@ -23,14 +25,14 @@ import { VerificationGate } from "@/components/verification-gate";
 
 
 const INTRO_TEXT =
-  "Before rewards settle, users provide a human-verification signal. Then AI-assisted scoring evaluates behavioral risk and reward economics. Finally, the protocol executes on-chain and issues tokens and proof NFTs.";
+  "Before rewards settle, users provide a human-verification signal. Then scoring evaluates behavioral risk and reward economics. Finally, the protocol executes on-chain and issues tokens and proof NFTs.";
 
 const STEPS = [
   { id: 0, label: "Opening narration", layer: "Protocol intro" },
   { id: 1, label: "Merchant creates incentive", layer: "Layer 3 - API" },
   { id: 2, label: "Identity verification", layer: "Layer 4 -> 3" },
   { id: 3, label: "Claim incentive", layer: "Layer 3 - API" },
-  { id: 4, label: "AI evaluation", layer: "Layer 2 - AI" },
+  { id: 4, label: "Claim validation", layer: "Layer 2 - Scoring" },
   { id: 5, label: "Blockchain output", layer: "Layer 1 - Solana" },
 ] as const;
 
@@ -151,6 +153,7 @@ function JsonCard({
 }
 
 export default function DemoPage() {
+  const { publicKey, connected } = useWallet();
   const [sessionId, setSessionId] = useState("demo-session-pending");
   const [demoKey, setDemoKey] = useState<string | undefined>(undefined);
   const [searchReady, setSearchReady] = useState(false);
@@ -189,6 +192,19 @@ export default function DemoPage() {
   const [logs, setLogs] = useState<DemoLogEvent[]>([]);
 
   const openedExplorerRef = useRef<string | null>(null);
+  const connectedWallet = publicKey?.toBase58() ?? null;
+  const walletGateMessage =
+    "Connect wallet first. This demo uses a server-side demo signer for settlement, but wallet connection is required before validation or mint steps.";
+
+  function requireConnectedWallet() {
+    if (publicKey) {
+      return true;
+    }
+
+    setActionError(walletGateMessage);
+    appendLocalLog(0, "system", "warning", "Wallet connection required", walletGateMessage);
+    return false;
+  }
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -328,6 +344,12 @@ export default function DemoPage() {
       return;
     }
 
+    if (!publicKey) {
+      setActionError(walletGateMessage);
+      appendLocalLog(5, "solana", "warning", "Settlement blocked", walletGateMessage);
+      return;
+    }
+
     const activeQuestId = createData.quest.id;
     const activeWallet = bootstrap.demoWallet;
     const activeLat = createData.merchant.lat;
@@ -361,7 +383,7 @@ export default function DemoPage() {
     }
 
     void runSettlement();
-  }, [bootstrap, createData, demoKey, sessionId, settlementData, settlePending, simulationData, simulationRejectMode]);
+  }, [bootstrap, createData, demoKey, publicKey, sessionId, settlementData, settlePending, simulationData, simulationRejectMode]);
 
   useEffect(() => {
     const explorerUrl = settlementData?.blockchain.explorerUrl;
@@ -422,6 +444,10 @@ export default function DemoPage() {
   }
 
   async function handleVerifyWorldId(payload: WorldIdProofPayload) {
+    if (!requireConnectedWallet()) {
+      return;
+    }
+
     setVerifyPending(true);
     setActionError(null);
     appendLocalLog(2, "api", "info", "Identity proof submitted", "User is providing a human-verification signal before claim.", payload);
@@ -449,6 +475,10 @@ export default function DemoPage() {
       return;
     }
 
+    if (!requireConnectedWallet()) {
+      return;
+    }
+
     setSimulatePending(true);
     setActionError(null);
     appendLocalLog(
@@ -456,10 +486,12 @@ export default function DemoPage() {
       "api",
       "info",
       "Claim request sent",
-      forceReject ? "Claim will continue through the reject scenario." : "Claim passed the identity gate and is moving to AI.",
+      forceReject ? "Claim will continue through the reject scenario." : "Claim passed the identity gate and is moving to scoring.",
       {
         questId: createData.quest.id,
         wallet: bootstrap.demoWallet,
+        connectedWallet,
+        settlementSigner: "server-side demo signer",
         worldVerified: worldVerification.worldVerified,
         gpsAccuracy: forceReject ? 500 : 12,
       },
@@ -502,10 +534,10 @@ export default function DemoPage() {
         {/* Protocol status header */}
         <div className="demoNarrationCard">
           <p className="eyebrow">Protocol dashboard</p>
-          <h2>AI controls real-world economic incentives on-chain.</h2>
+          <h2>PIKO validates incentives before settlement.</h2>
           <p className="heroCopy">
             Every reward passes through fraud detection, dynamic pricing, and human verification before settlement.
-            Nothing mints without AI approval.
+            Nothing mints without an approved validation result.
           </p>
           <div className="demoMetricGrid">
             <div className="demoMetricCard">
@@ -515,7 +547,7 @@ export default function DemoPage() {
               </strong>
             </div>
             <div className="demoMetricCard">
-              <span>AI Decision</span>
+              <span>Validation</span>
               <strong style={{ color: decision === "APPROVED" ? "var(--solana-green)" : decision === "REJECTED" ? "#ff6b6b" : "var(--ink-muted)" }}>
                 {decision ?? "Pending"}
               </strong>
@@ -607,7 +639,22 @@ export default function DemoPage() {
                 <ProtocolBadge tone={bootstrap.capabilities.nft.mode}>
                   NFT {bootstrap.capabilities.nft.mode}
                 </ProtocolBadge>
+                <ProtocolBadge tone={connected ? "good" : "warn"}>
+                  {connected ? "Wallet connected" : "Wallet required"}
+                </ProtocolBadge>
               </div>
+              {!connected ? (
+                <div className="demoWalletNotice">
+                  <div>
+                    <strong>Connect wallet before auth and mint steps</strong>
+                    <p>
+                      The backend demo signer executes proof transactions, but wallet connection is required before
+                      identity verification or settlement can be triggered.
+                    </p>
+                  </div>
+                  <WalletMultiButton />
+                </div>
+              ) : null}
               <button className="primaryButton demoStageAction" type="button" onClick={() => setCurrentStep(1)}>
                 Start protocol
               </button>
@@ -733,6 +780,13 @@ export default function DemoPage() {
                 Rewards are locked until the wallet proves it belongs to a real human.
                 No manual bypass — the protocol enforces this cryptographically.
               </p>
+              <div className="demoWalletNotice compact">
+                <div>
+                  <strong>{connectedWallet ? `Connected: ${truncateAddress(connectedWallet, 6)}` : "Wallet connection required"}</strong>
+                  <p>Identity verification will not proceed until a wallet is connected.</p>
+                </div>
+                {!connectedWallet ? <WalletMultiButton /> : null}
+              </div>
             </div>
 
             <VerificationGate
@@ -766,7 +820,7 @@ export default function DemoPage() {
               <h2>Claim stays disabled until identity is verified.</h2>
               <p className="heroCopy">
                 The backend enforces the same rule as the UI: if <code>worldVerified</code> is false, claim is rejected
-                before AI review starts.
+                before scoring starts.
               </p>
 
               <div className="demoChipRow">
@@ -776,7 +830,14 @@ export default function DemoPage() {
                 <ProtocolBadge tone={forceReject ? "warn" : "good"}>
                   {forceReject ? "Fraud reject demo" : "Approval demo"}
                 </ProtocolBadge>
+                <ProtocolBadge tone={connected ? "good" : "warn"}>
+                  {connected ? "Wallet gate passed" : "Connect wallet"}
+                </ProtocolBadge>
               </div>
+              <p className="supportText">
+                Settlement proof is powered by the server-side demo signer. Your connected wallet gates this demo action;
+                it is not presented as the NFT mint authority.
+              </p>
 
               <button
                 className="primaryButton demoStageAction"
@@ -784,7 +845,7 @@ export default function DemoPage() {
                 disabled={!createData || !worldVerification?.worldVerified || simulatePending}
                 onClick={() => void handleClaimIncentive()}
               >
-                {simulatePending ? "Claiming incentive..." : "Claim incentive"}
+                {simulatePending ? "Claiming incentive..." : connected ? "Claim incentive" : "Connect wallet first"}
               </button>
 
               <label className="demoSwitch">
@@ -794,7 +855,7 @@ export default function DemoPage() {
               </label>
             </div>
 
-            {/* Show AI Decision Panel immediately after claim */}
+            {/* Show decision panel immediately after claim */}
             {simulationData ? (
               <AIDecisionPanel
                 fraudScore={simulationData.review.fraud.decision.score}
@@ -822,15 +883,15 @@ export default function DemoPage() {
         return (
           <div className="demoStageStack">
             <div className="demoNarrationCard">
-              <p className="eyebrow">Layer 2 - AI Decision Engine</p>
-              <h2>AI evaluates every claim in real-time.</h2>
+              <p className="eyebrow">Layer 2 - Scoring Engine</p>
+              <h2>PIKO evaluates every claim before rewards settle.</h2>
               <p className="heroCopy">
-                Three agents work together: Fraud detection scores risk, Reward optimization calculates the multiplier,
+                Fraud scoring checks risk, reward optimization calculates the multiplier,
                 and the identity-layer signal is factored into the final decision.
               </p>
             </div>
 
-            {/* Hero: AI Decision Panel */}
+            {/* Hero: decision panel */}
             {simulationData ? (
               <AIDecisionPanel
                 fraudScore={simulationData.review.fraud.decision.score}
@@ -844,12 +905,12 @@ export default function DemoPage() {
             ) : (
               <div className="demoEmptyState">
                 <h3>Waiting for claim</h3>
-                <p className="supportText">Complete Step 3 to see the AI decision engine in action.</p>
+                <p className="supportText">Complete Step 3 to see claim validation in action.</p>
               </div>
             )}
 
             <JsonCard
-              title="AI review payload"
+              title="Validation payload"
               data={
                 simulationData
                   ? {
@@ -869,10 +930,10 @@ export default function DemoPage() {
           <div className="demoStageStack">
             <div className="demoNarrationCard">
               <p className="eyebrow">Layer 1 - Solana</p>
-              <h2>AI-approved settlement on-chain.</h2>
+              <h2>Approved settlement on-chain.</h2>
               <p className="heroCopy">
-                The protocol executes the AI&apos;s decision on Solana — minting tokens, issuing NFT badges,
-                and recording the full audit trail.
+                The server-side demo signer executes the validation result on Solana, issuing proof artifacts and recording
+                the full audit trail. The connected wallet gates this judge-facing demo flow.
               </p>
             </div>
 
@@ -886,7 +947,7 @@ export default function DemoPage() {
             ) : (
               <div className="demoEmptyState">
                 <h3>Waiting for settlement</h3>
-                <p className="supportText">The AI decision from Step 4 will trigger on-chain execution here.</p>
+                <p className="supportText">The validation result from Step 4 will trigger on-chain execution here.</p>
               </div>
             )}
 
@@ -979,8 +1040,12 @@ export default function DemoPage() {
 
           <div className="demoSidebarFooter">
             <div className="demoSidebarMetric">
-              <span>Demo wallet</span>
+              <span>Demo signer</span>
               <strong>{bootstrap ? truncateAddress(bootstrap.demoWallet, 6) : "Waiting..."}</strong>
+            </div>
+            <div className="demoSidebarMetric">
+              <span>Connected wallet</span>
+              <strong>{connectedWallet ? truncateAddress(connectedWallet, 6) : "Required"}</strong>
             </div>
             <div className="demoSidebarMetric">
               <span>Session</span>

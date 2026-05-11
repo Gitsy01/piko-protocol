@@ -15,7 +15,8 @@ export function DemoWalletGate() {
         </div>
         <h2 className="demoWalletGateTitle">Connect wallet to start the flow</h2>
         <p className="demoWalletGateSub">
-          Connect Phantom or Backpack to complete incentive flows and settle PIKO on Solana.
+          Connect Phantom or Backpack before validation, proof creation, or demo settlement can run. The controlled demo
+          signer may execute proof transactions, but wallet connection gates the flow.
         </p>
         <div className="demoWalletGateAction">
           <WalletMultiButton />

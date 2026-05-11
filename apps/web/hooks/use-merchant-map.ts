@@ -1,11 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getNearbyMerchants, getSuggestions } from "@/lib/api";
+import { demoMerchants } from "@/lib/demo-data";
 import { HeatmapNode, MapSuggestion, MerchantPinType } from "@/lib/types";
 
 const DEFAULT_LOCATION = { lat: 28.6139, lng: 77.209 };
 const REFRESH_DISTANCE_METERS = 120;
+const DEMO_MERCHANTS = demoMerchants.slice(0, 5);
+const DEMO_CLUSTER_CENTER = DEMO_MERCHANTS.reduce(
+  (accumulator, merchant) => ({
+    lat: accumulator.lat + merchant.lat / DEMO_MERCHANTS.length,
+    lng: accumulator.lng + merchant.lng / DEMO_MERCHANTS.length,
+  }),
+  { lat: 0, lng: 0 }
+);
 
 type LocationStatus = "locating" | "tracking" | "fallback" | "unsupported" | "denied";
 
@@ -26,16 +35,40 @@ function distanceBetweenMeters(
   return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function getDemoMerchantFallback(origin: { lat: number; lng: number }) {
+  return DEMO_MERCHANTS.map((merchant) => {
+    const projected = {
+      ...merchant,
+      lat: origin.lat + (merchant.lat - DEMO_CLUSTER_CENTER.lat),
+      lng: origin.lng + (merchant.lng - DEMO_CLUSTER_CENTER.lng),
+    };
+
+    return {
+      ...projected,
+      distance: distanceBetweenMeters(origin, projected),
+    };
+  });
+}
+
+function getDemoHeatmapFallback(origin: { lat: number; lng: number }): HeatmapNode[] {
+  return getDemoMerchantFallback(origin).map((merchant) => ({
+    lat: merchant.lat,
+    lng: merchant.lng,
+    weight: Math.min(merchant.rewardMultiplier / 3, 1),
+  }));
+}
+
 export function useMerchantMap() {
   const [location, setLocation] = useState(DEFAULT_LOCATION);
   const [searchLocation, setSearchLocation] = useState(DEFAULT_LOCATION);
-  const [merchants, setMerchants] = useState<MerchantPinType[]>([]);
-  const [heatmapData, setHeatmapData] = useState<HeatmapNode[]>([]);
+  const [merchants, setMerchants] = useState<MerchantPinType[]>(() => getDemoMerchantFallback(DEFAULT_LOCATION));
+  const [heatmapData, setHeatmapData] = useState<HeatmapNode[]>(() => getDemoHeatmapFallback(DEFAULT_LOCATION));
   const [suggestions, setSuggestions] = useState<MapSuggestion[]>([]);
   const [locationStatus, setLocationStatus] = useState<LocationStatus>("locating");
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const usingDemoFallbackRef = useRef(true);
 
   useEffect(() => {
     if (!("geolocation" in navigator)) {
@@ -53,6 +86,11 @@ export function useMerchantMap() {
       setAccuracy(position.coords.accuracy ?? null);
       setLastUpdatedAt(Date.now());
       setLocationStatus("tracking");
+
+      if (usingDemoFallbackRef.current) {
+        setMerchants(getDemoMerchantFallback(nextLocation));
+        setHeatmapData(getDemoHeatmapFallback(nextLocation));
+      }
 
       setSearchLocation((current) =>
         distanceBetweenMeters(current, nextLocation) >= REFRESH_DISTANCE_METERS ? nextLocation : current
@@ -105,6 +143,7 @@ export function useMerchantMap() {
       setMerchants(merchantResult.merchants);
       setHeatmapData(merchantResult.heatmapData);
       setSuggestions(suggestionResult.suggestions);
+      usingDemoFallbackRef.current = false;
       setLoading(false);
 
       // Offline merchant cache
@@ -133,6 +172,7 @@ export function useMerchantMap() {
           };
           setMerchants(parsed.merchants);
           setHeatmapData(parsed.heatmapData);
+          usingDemoFallbackRef.current = false;
         }
       } catch {
         // Ignore parse errors

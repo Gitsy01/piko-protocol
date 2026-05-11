@@ -3,9 +3,8 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { AIDecisionPanel } from "@/components/ai-decision-panel";
 import { useDemoHref } from "@/hooks/use-demo-mode";
-import { demoAiPreview, demoPrimaryMerchant, demoPrimaryQuest } from "@/lib/demo-data";
+import { demoPrimaryMerchant, demoPrimaryQuest } from "@/lib/demo-data";
 import { formatDistance, formatReward } from "@/lib/utils";
 
 const DynamicMapView = dynamic(
@@ -44,43 +43,27 @@ export function DemoKioskHome() {
       <section className="demoKioskHero">
         <div className="demoKioskCopy">
           <p className="eyebrow">PIKO Protocol</p>
-          <h1>AI-powered contributor intelligence for on-chain communities.</h1>
+          <h1>Verify real contributions before rewards are issued.</h1>
           <p className="heroCopy">
-            This controlled judge path shows the scoring narrative. Use the live Phantom path separately
-            to record wallet approval, devnet settlement, and Explorer verification.
+            Communities waste reward budgets when fake or low-quality contributors farm incentives. PIKO checks the action first, then issues the reward and proof.
           </p>
           <div className="demoKioskFlow">
             <div className="demoKioskFlowStep">
               <span>1</span>
-              <strong>Open map</strong>
+              <strong>Map</strong>
             </div>
             <div className="demoKioskFlowStep">
               <span>2</span>
-              <strong>Tap Cafe Bloom</strong>
+              <strong>Claim</strong>
             </div>
             <div className="demoKioskFlowStep">
               <span>3</span>
-              <strong>Run scoring</strong>
+              <strong>Validate</strong>
             </div>
             <div className="demoKioskFlowStep">
               <span>4</span>
-              <strong>Settle 5 PIKO</strong>
+              <strong>Proof</strong>
             </div>
-          </div>
-        </div>
-
-        <div className="demoKioskStats">
-          <div className="statChip">
-            <span>1</span>
-            <p>Merchant pin</p>
-          </div>
-          <div className="statChip">
-            <span>5</span>
-            <p>PIKO reward</p>
-          </div>
-          <div className="statChip">
-            <span>1.5x</span>
-            <p>AI boost</p>
           </div>
         </div>
       </section>
@@ -90,7 +73,7 @@ export function DemoKioskHome() {
           <div className="demoKioskMapHeader">
             <div>
               <p className="eyebrow">Demo map</p>
-              <h2>One pin. One deterministic path.</h2>
+              <h2>One highlighted contribution.</h2>
             </div>
             <span className="supportText">Tap the Cafe Bloom pin to continue.</span>
           </div>
@@ -132,22 +115,12 @@ export function DemoKioskHome() {
                 </div>
               </div>
 
-              <AIDecisionPanel
-                fraudScore={demoAiPreview.fraudScore}
-                fraudFlags={demoAiPreview.fraudFlags}
-                rewardMultiplier={demoAiPreview.rewardMultiplier}
-                rewardReasons={demoAiPreview.rewardReasons}
-                decision={demoAiPreview.decision}
-                worldVerified={demoAiPreview.worldVerified}
-                compact
-              />
-
               <p className="supportText demoKioskHint">
-                AI is visible now: low fraud risk, reward logic, and the exact reasons for approval.
+                Start the flow to see payment, location, identity, fraud score, reward approval, and proof NFT.
               </p>
 
               <Link className="primaryButton demoKioskCta" href={flowHref}>
-                Run the 5 PIKO flow
+                Start 5 PIKO flow
               </Link>
             </>
           ) : (

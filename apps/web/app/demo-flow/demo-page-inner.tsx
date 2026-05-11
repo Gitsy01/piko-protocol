@@ -2,12 +2,14 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useDemoContext } from "@/providers/demo-context";
 import { DemoStepper } from "@/components/demo-stepper";
 import { DemoQuestCard } from "@/components/demo-quest-card";
 import { DemoPayPanel } from "@/components/demo-pay-panel";
 import { AIEvaluationScreen } from "@/components/ai-evaluation-screen";
 import { DemoReward } from "@/components/demo-reward";
+import { DemoWalletGate } from "@/components/demo-wallet-gate";
 
 const DynamicMapView = dynamic(
   () => import("@/components/map-view").then((module) => module.MapView),
@@ -16,6 +18,7 @@ const DynamicMapView = dynamic(
 
 export function DemoPageInner() {
   const { state } = useDemoContext();
+  const { publicKey, connected } = useWallet();
   const { merchant } = state;
 
   const location = { lat: merchant.lat - 0.0012, lng: merchant.lng - 0.001 };
@@ -48,11 +51,16 @@ export function DemoPageInner() {
           <span className="brandMark">PIKO Protocol</span>
         </Link>
         <div className="demoTopbarRight">
+          <span className={`demoConnectedWallet ${connected ? "connected" : ""}`}>
+            {publicKey ? `${publicKey.toBase58().slice(0, 6)}...${publicKey.toBase58().slice(-4)}` : "Wallet required"}
+          </span>
           <Link href="/" className="demoExitLink" aria-label="Exit demo">
             Back to full app
           </Link>
         </div>
       </header>
+
+      {!connected ? <DemoWalletGate /> : null}
 
       <DemoStepper />
 

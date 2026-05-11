@@ -10,7 +10,7 @@ type AIDecisionSummaryPanelProps = {
 function renderEmptyState() {
   return (
     <div className="aiSummaryEmpty">
-      <strong>AI decision pending</strong>
+      <strong>Validation pending</strong>
       <p className="supportText">Complete the payment step to reveal the fraud tier, reward multiplier, and agent reason.</p>
     </div>
   );

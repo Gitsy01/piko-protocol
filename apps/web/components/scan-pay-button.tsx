@@ -85,7 +85,7 @@ function buildFallbackAiDecision(result: VerificationResult): AIDecisionSummary 
     fraudTier,
     fraudScore,
     rewardMultiplier: result.rewardMultiplier ?? 1,
-    reason: result.aiSummary ?? "AI decision recorded for this incentive claim.",
+    reason: result.aiSummary ?? "Validation decision recorded for this incentive claim.",
   };
 }
 
@@ -237,6 +237,7 @@ export function ScanPayButton({
 
   async function generatePaymentRequest() {
     if (!publicKey) {
+      setError("Connect wallet first.");
       return;
     }
 
@@ -292,6 +293,7 @@ export function ScanPayButton({
 
   async function finalizeQuestPayment(signatureHint?: string) {
     if (!publicKey || !paymentRequest) {
+      setError(!publicKey ? "Connect wallet first." : "Generate the payment request first.");
       return;
     }
 
@@ -341,6 +343,7 @@ export function ScanPayButton({
 
   async function payWithConnectedWallet() {
     if (!publicKey || !paymentRequest) {
+      setError(!publicKey ? "Connect wallet first." : "Generate the payment request first.");
       return;
     }
 

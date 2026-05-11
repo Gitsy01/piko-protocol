@@ -21,24 +21,24 @@ const body = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://piko-protocol.app"),
   applicationName: "PIKO Protocol",
-  title: "PIKO Protocol | Contributor Intelligence and On-Chain Reputation",
+  title: "PIKO Protocol | Verified Rewards and On-Chain Proofs",
   description:
-    "AI-powered contributor intelligence and verifiable on-chain reputation infrastructure for decentralized communities.",
-  keywords: ["Solana", "Solana Pay", "contributor intelligence", "on-chain reputation", "community rewards", "PIKO Protocol", "web3", "PWA"],
+    "PIKO verifies whether a contribution was real before community rewards are issued.",
+  keywords: ["Solana", "Solana Pay", "fraud scoring", "on-chain reputation", "community rewards", "PIKO Protocol", "web3", "PWA"],
   authors: [{ name: "PIKO Protocol" }],
   icons: {
     icon: "/icons/icon-192.svg",
     apple: "/icons/icon-192.svg",
   },
   openGraph: {
-    title: "PIKO Protocol | Contributor Intelligence and On-Chain Reputation",
-    description: "AI-powered contributor intelligence with visible verification signals and on-chain proof artifacts.",
+    title: "PIKO Protocol | Verified Rewards and On-Chain Proofs",
+    description: "Verify contribution actions with visible risk signals and on-chain proof artifacts.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PIKO Protocol | Contributor Intelligence and On-Chain Reputation",
-    description: "Verifiable on-chain reputation infrastructure for decentralized communities.",
+    title: "PIKO Protocol | Verified Rewards and On-Chain Proofs",
+    description: "Contribution checks, reward settlement, and proof NFTs for community incentives.",
   },
 };
 

@@ -592,6 +592,55 @@ h1, h2, h3 {
   overflow: hidden;
 }
 
+.demoRouteHud {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 172px;
+  z-index: 35;
+  display: grid;
+  gap: 6px;
+  max-width: min(280px, calc(100% - 32px));
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: rgba(10, 10, 18, 0.88);
+  border: 1px solid rgba(255, 209, 102, 0.28);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(20, 241, 149, 0.08);
+  pointer-events: none;
+}
+
+.demoRouteHud strong {
+  font-size: 0.96rem;
+  color: #fff7e0;
+}
+
+.demoRouteLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--solana-green);
+}
+
+.demoRouteChips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.demoRouteChips span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f7f9ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .mapFallback {
   display: grid;
   place-items: center;
@@ -1668,6 +1717,10 @@ h1, h2, h3 {
 
 .demoKioskCta {
   width: 100%;
+  background: var(--solana-green);
+  color: #07110d;
+  border-color: rgba(20, 241, 149, 0.22);
+  box-shadow: none;
 }
 
 .demoKioskEmpty,
@@ -1999,6 +2052,40 @@ h1, h2, h3 {
   box-shadow: 0 16px 38px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(20, 241, 149, 0.06);
 }
 
+.mapLocateToast {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(10, 29, 24, 0.92);
+  border: 1px solid rgba(20, 241, 149, 0.24);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+  color: #f3fffb;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.demoRouteLineGlow {
+  animation: routeGlowPulse 2s ease-in-out infinite;
+}
+
+.demoRouteLineCore {
+  animation: routeDashFlow 1.6s linear infinite;
+}
+
+.routeDestinationPulse {
+  animation: routeDestinationBeat 1.8s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mapLocateToast {
+    animation: fadeInUp 0.18s ease-out;
+  }
+
+  .demoRouteHud {
+    animation: fadeInUp 0.18s ease-out;
+  }
+}
+
 .mapParticles {
   position: absolute;
   inset: 0;
@@ -2103,6 +2190,40 @@ h1, h2, h3 {
   }
   50% {
     fill-opacity: 0.22;
+  }
+}
+
+@keyframes routeDashFlow {
+  from {
+    stroke-dashoffset: 48;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes routeGlowPulse {
+  0%,
+  100% {
+    stroke-opacity: 0.12;
+  }
+  50% {
+    stroke-opacity: 0.3;
+  }
+}
+
+@keyframes routeDestinationBeat {
+  0% {
+    stroke-opacity: 0.5;
+    fill-opacity: 0.18;
+  }
+  70% {
+    stroke-opacity: 0.04;
+    fill-opacity: 0.02;
+  }
+  100% {
+    stroke-opacity: 0;
+    fill-opacity: 0;
   }
 }
 
@@ -3363,6 +3484,38 @@ h1, h2, h3 {
   min-height: 44px;
 }
 
+.demoWalletNotice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 107, 44, 0.08);
+  border: 1px solid rgba(255, 107, 44, 0.22);
+}
+
+.demoWalletNotice.compact {
+  margin-bottom: 0;
+}
+
+.demoWalletNotice strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.demoWalletNotice p {
+  margin-top: 4px;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.demoWalletNotice .wallet-adapter-button {
+  flex-shrink: 0;
+}
+
 .demoForm {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3842,6 +3995,27 @@ h1, h2, h3 {
   gap: 10px;
 }
 
+.demoConnectedWallet {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #ffb68d;
+  background: rgba(255, 107, 44, 0.08);
+  border: 1px solid rgba(255, 107, 44, 0.22);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.demoConnectedWallet.connected {
+  color: var(--solana-green);
+  background: rgba(20, 241, 149, 0.08);
+  border-color: rgba(20, 241, 149, 0.22);
+}
+
 .demoExitLink {
   display: inline-flex;
   align-items: center;
@@ -4249,6 +4423,25 @@ h1, h2, h3 {
 .demoPayNowCta { font-size: 1.15rem; min-height: 60px; }
 .demoPayWalletNote { text-align: center; font-size: 0.8rem; color: var(--ink-dim); }
 
+.demoWalletGateCard {
+  background: rgba(12, 16, 24, 0.98);
+  border-color: rgba(20, 241, 149, 0.18);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.46);
+}
+
+.demoWalletGateIcon {
+  background: rgba(20, 241, 149, 0.08);
+  border-color: rgba(20, 241, 149, 0.18);
+  color: var(--solana-green);
+}
+
+.demoWalletGate .wallet-adapter-button {
+  background: var(--solana-green) !important;
+  color: #07110d !important;
+  border-radius: var(--radius-pill) !important;
+  box-shadow: none !important;
+}
+
 /* --- Reward Screen --- */
 .demoReward {
   position: fixed;
@@ -4456,6 +4649,8 @@ h1, h2, h3 {
 /* --- Mobile Overrides --- */
 @media (max-width: 480px) {
   .demoTopbar { padding: 8px 12px; }
+  .demoTopbarRight { gap: 6px; }
+  .demoConnectedWallet { min-height: 36px; padding: 0 9px; font-size: 0.68rem; }
   .demoExitLink { padding: 6px 10px; font-size: 0.75rem; }
   .demoStepper { padding: 10px 12px; }
   .demoStepConnector { width: 24px; }
@@ -4509,7 +4704,7 @@ h1, h2, h3 {
 /* ═══════════════════════════════════════════════════════════════
    AI DECISION ENGINE COMPONENTS
    Fraud score bars, multiplier badges, approval celebration,
-   verification gate — the visual proof that AI controls rewards.
+   verification gate - the visual proof that validation controls rewards.
    ═══════════════════════════════════════════════════════════════ */
 
 /* --- AI Decision Panel --- */
@@ -5257,6 +5452,28 @@ h1, h2, h3 {
   font-size: 0.88rem;
 }
 
+.aiSignerDisclosure {
+  margin-top: 4px;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.aiSignerBadge {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--solana-green);
+  background: rgba(20, 241, 149, 0.08);
+  border: 1px solid rgba(20, 241, 149, 0.18);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .aiNftMint {
   display: block;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -5362,6 +5579,50 @@ h1, h2, h3 {
   justify-content: center;
   text-decoration: none;
   font-size: 0.88rem;
+}
+
+.aiProgramProofList {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.aiProgramProofTitle {
+  color: var(--ink-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.aiProgramProofLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(20, 241, 149, 0.06);
+  border: 1px solid rgba(20, 241, 149, 0.18);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.aiProgramProofLink:hover {
+  background: rgba(20, 241, 149, 0.1);
+  border-color: rgba(20, 241, 149, 0.3);
+}
+
+.aiProgramProofLink span {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.aiProgramProofLink strong {
+  flex-shrink: 0;
+  color: var(--solana-green);
 }
 
 /* Approval summary */
@@ -6274,5 +6535,614 @@ h1, h2, h3 {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* Focused judge demo polish */
+.demoKioskPage {
+  gap: 16px;
+}
+
+.demoKioskHero {
+  align-items: center;
+  padding: 28px;
+  background: rgba(10, 10, 18, 0.88);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.demoKioskCopy {
+  max-width: 48rem;
+}
+
+.demoKioskFlow {
+  display: inline-grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 8px;
+}
+
+.demoKioskFlowStep {
+  min-width: 92px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.demoKioskFlowStep span {
+  width: 24px;
+  height: 24px;
+  background: rgba(20, 241, 149, 0.1);
+  color: var(--solana-green);
+}
+
+.demoKioskLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.demoKioskMapCard {
+  padding: 18px;
+  background: rgba(10, 10, 18, 0.9);
+  box-shadow: none;
+}
+
+.demoKioskMapHeader {
+  margin-bottom: 12px;
+}
+
+.demoKioskMapShell,
+.demoKioskMapShell .mapShell,
+.demoKioskMapShell .mapCanvas,
+.demoKioskMapShell .mapFallback {
+  min-height: 560px;
+  height: 560px;
+}
+
+.demoKioskMapShell .leaflet-tile-pane {
+  opacity: 0;
+}
+
+.demoKioskMapShell .leaflet-container {
+  background:
+    radial-gradient(circle at 52% 48%, rgba(20, 241, 149, 0.12), transparent 18rem),
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    #0a0f16;
+  background-size: auto, 56px 56px, 56px 56px, auto;
+}
+
+.demoKioskMapShell .leaflet-control-attribution {
+  display: none;
+}
+
+.demoKioskQuestCard {
+  position: relative;
+  z-index: 4;
+  width: min(560px, calc(100% - 32px));
+  margin: -132px auto 0;
+  padding: 24px;
+  gap: 14px;
+  border-radius: var(--radius-xl);
+  background: rgba(12, 16, 24, 0.96);
+  border-color: rgba(20, 241, 149, 0.18);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+}
+
+.demoKioskQuestCard .aiDecisionPanel {
+  display: none;
+}
+
+.demoKioskMeta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.demoKioskMetaRow {
+  display: grid;
+  gap: 4px;
+  justify-content: stretch;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.demoKioskHint {
+  max-width: 38rem;
+}
+
+.demoFlowPage {
+  background: #080b10;
+}
+
+.demoMapBg {
+  opacity: 0.46;
+}
+
+.demoMapGradient {
+  background:
+    linear-gradient(to top, rgba(8, 11, 16, 0.98) 0%, rgba(8, 11, 16, 0.82) 46%, rgba(8, 11, 16, 0.22) 100%),
+    linear-gradient(to bottom, rgba(8, 11, 16, 0.9) 0%, transparent 34%);
+}
+
+.demoStepper {
+  padding: 10px 20px;
+}
+
+.demoStepItem:not(.active):not(.done) {
+  opacity: 0.48;
+}
+
+.demoStepItem.active .demoStepDot {
+  animation: none;
+}
+
+.demoContentArea {
+  justify-content: center;
+  padding: 28px 16px calc(env(safe-area-inset-bottom, 0px) + 32px);
+}
+
+.demoCta {
+  min-height: 54px;
+  border: 1px solid rgba(20, 241, 149, 0.2);
+  background: var(--solana-green);
+  color: #07110d;
+  box-shadow: none;
+  animation: none;
+  transition: transform 120ms ease-out, opacity 120ms ease-out, background-color 120ms ease-out;
+}
+
+.demoCta:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #47f5ad;
+}
+
+.demoCta:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.demoCta:focus-visible,
+.demoMerchantProfileLink:focus-visible,
+.aiExplorerButton:focus-visible,
+.decisionReceiptProof a:focus-visible {
+  outline: 2px solid var(--solana-green);
+  outline-offset: 3px;
+}
+
+.demoQuestCard,
+.demoPayPanel {
+  max-width: 520px;
+  padding: 26px;
+  border-radius: var(--radius-xl);
+  background: rgba(12, 16, 24, 0.96);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  animation: fadeInUp 220ms ease-out;
+}
+
+.demoQuestCardGlow,
+.demoPayPanelGlow {
+  display: none;
+}
+
+.demoQuestCardTop {
+  align-items: flex-start;
+}
+
+.demoQuestMerchantAvatar {
+  background: rgba(20, 241, 149, 0.08);
+  border-color: rgba(20, 241, 149, 0.18);
+  color: var(--solana-green);
+}
+
+.demoQuestStory {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.demoQuestStory h3 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+}
+
+.demoQuestStory p,
+.demoQuestDesc {
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.demoQuestMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.demoQuestMetaItem {
+  display: grid;
+  gap: 6px;
+  min-height: 76px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.demoQuestMetaItem span {
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.demoQuestMetaItem strong {
+  color: var(--ink);
+  font-size: 1.1rem;
+}
+
+.demoQuestReward strong {
+  color: var(--solana-green);
+}
+
+.demoPayFlow {
+  gap: 8px;
+}
+
+.demoPayStep {
+  min-height: 52px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 120ms ease-out, background-color 120ms ease-out;
+}
+
+.demoPayStep.active {
+  border-color: rgba(20, 241, 149, 0.26);
+  background: rgba(20, 241, 149, 0.06);
+}
+
+.demoPayStepNum {
+  background: rgba(20, 241, 149, 0.08);
+  border-color: rgba(20, 241, 149, 0.18);
+  color: var(--solana-green);
+}
+
+.demoPayStepArrow {
+  display: none;
+}
+
+.demoPayNowCta {
+  min-height: 56px;
+}
+
+.aiEvalScreen {
+  width: min(720px, calc(100vw - 24px));
+  min-height: auto;
+}
+
+.aiEvalScanOverlay {
+  min-height: 360px;
+  border-radius: var(--radius-xl);
+  background: rgba(12, 16, 24, 0.96);
+  border: 1px solid rgba(20, 241, 149, 0.14);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+}
+
+.aiEvalScanCore {
+  color: var(--solana-green);
+}
+
+.validationHeroCard,
+.decisionReceipt {
+  border-radius: var(--radius-xl);
+  background: rgba(12, 16, 24, 0.98);
+  border: 1px solid rgba(20, 241, 149, 0.2);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.46);
+}
+
+.validationHeroCard {
+  padding: clamp(24px, 4vw, 42px);
+  text-align: left;
+}
+
+.validationHeroHeader {
+  display: grid;
+  gap: 10px;
+  max-width: 42rem;
+}
+
+.validationHeroIcon,
+.decisionReceiptCheckIcon {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(20, 241, 149, 0.12);
+  color: var(--solana-green);
+  font-weight: 800;
+}
+
+.validationHeroIcon {
+  width: 48px;
+  height: 48px;
+}
+
+.validationHeroHeader h2 {
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 0.98;
+}
+
+.validationHeroHeader p {
+  color: var(--ink-muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.validationHeroChecks,
+.decisionReceiptChecks {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 28px 0 0;
+  list-style: none;
+}
+
+.validationHeroChecks li,
+.decisionReceiptCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--ink);
+}
+
+.validationHeroChecks li:last-child,
+.decisionReceiptCheck:last-child {
+  border-bottom: none;
+}
+
+.validationHeroChecks li span,
+.decisionReceiptCheckIcon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  font-size: 0.72rem;
+}
+
+.validationHeroChecks li.failed span,
+.decisionReceiptCheck.failed .decisionReceiptCheckIcon {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ff8a8a;
+}
+
+.validationHeroOutcome,
+.decisionReceiptOutcome {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.validationHeroOutcome div,
+.decisionReceiptOutcome div {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(20, 241, 149, 0.06);
+  border: 1px solid rgba(20, 241, 149, 0.14);
+}
+
+.validationHeroOutcome span,
+.decisionReceiptOutcome span,
+.decisionReceiptProof span,
+.decisionReceiptMetadata dt {
+  color: var(--ink-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.validationHeroOutcome strong,
+.decisionReceiptOutcome strong {
+  color: var(--solana-green);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.35rem;
+}
+
+.aiApprovalCard {
+  width: min(760px, calc(100vw - 24px));
+  padding: clamp(22px, 4vw, 40px);
+  border-radius: var(--radius-xl);
+  text-align: left;
+}
+
+.aiApprovalCard.approved {
+  background: rgba(12, 16, 24, 0.98);
+  border-color: rgba(20, 241, 149, 0.2);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.46);
+}
+
+.aiApprovalParticles {
+  display: none;
+}
+
+.aiApprovalHeader {
+  align-items: flex-start;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.aiApprovalIcon {
+  width: 48px;
+  height: 48px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(20, 241, 149, 0.12);
+  color: var(--solana-green);
+  font-size: 0.85rem;
+  animation: none;
+}
+
+.aiApprovalSubtitle {
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.demoRewardMoment {
+  max-width: none;
+  margin: 0 0 18px;
+  padding: 16px;
+  background: rgba(20, 241, 149, 0.055);
+  box-shadow: none;
+}
+
+.decisionReceipt {
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.decisionReceiptHero {
+  display: grid;
+  gap: 8px;
+}
+
+.decisionReceiptHero h2 {
+  font-size: clamp(1.7rem, 4vw, 2.7rem);
+  line-height: 1;
+}
+
+.decisionReceiptHero p {
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+
+.decisionReceiptCheck span:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.decisionReceiptCheck small {
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+
+.decisionReceiptProof {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.decisionReceiptProof div {
+  display: grid;
+  gap: 4px;
+}
+
+.decisionReceiptProof strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.decisionReceiptProof a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  background: rgba(20, 241, 149, 0.1);
+  color: var(--solana-green);
+  border: 1px solid rgba(20, 241, 149, 0.18);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.decisionReceiptMetadata {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0 0;
+}
+
+.decisionReceiptMetadata div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.decisionReceiptMetadata dt,
+.decisionReceiptMetadata dd {
+  margin: 0;
+}
+
+.decisionReceiptMetadata dd {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.aiApprovalBlockchain {
+  max-width: none;
+  margin-top: 18px;
+}
+
+.aiApprovalBlockchainRow {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.aiApprovalSummary,
+.aiRewardReveal,
+.aiBoostBanner {
+  display: none;
+}
+
+.aiApprovalActions {
+  position: static;
+  margin: 8px 0 0;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+@media (max-width: 768px) {
+  .demoKioskHero {
+    padding: 20px;
+  }
+
+  .demoKioskFlow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: grid;
+  }
+
+  .demoKioskMapShell,
+  .demoKioskMapShell .mapShell,
+  .demoKioskMapShell .mapCanvas,
+  .demoKioskMapShell .mapFallback {
+    min-height: 430px;
+    height: 430px;
+  }
+
+  .demoKioskQuestCard {
+    width: calc(100% - 20px);
+    margin-top: -96px;
+  }
+
+  .demoKioskMeta,
+  .demoQuestMeta,
+  .validationHeroOutcome,
+  .decisionReceiptOutcome,
+  .decisionReceiptMetadata {
+    grid-template-columns: 1fr;
+  }
+
+  .decisionReceiptProof {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

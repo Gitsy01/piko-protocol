@@ -99,9 +99,9 @@ export function AIDecisionPanel({
   return (
     <div className={`aiDecisionPanel ${compact ? "compact" : ""}`} id="ai-decision-panel">
       <div className="aiDecisionHeader">
-        <div className="aiDecisionIcon" aria-hidden="true">AI</div>
+        <div className="aiDecisionIcon" aria-hidden="true">OK</div>
         <div>
-          <p className="eyebrow">AI Decision</p>
+          <p className="eyebrow">Validation Decision</p>
           <h3>Why the reward was issued</h3>
         </div>
         {decision ? (
@@ -182,7 +182,7 @@ export function AIDecisionPanel({
         <div className="aiBoostBanner">
           <span className="aiBoostBannerIcon" aria-hidden="true">UP</span>
           <div>
-            <strong>AI Boost Active</strong>
+            <strong>Risk-Adjusted Boost Active</strong>
             <span>+{((displayMultiplier - 1) * 100).toFixed(0)}% reward boost applied</span>
           </div>
         </div>

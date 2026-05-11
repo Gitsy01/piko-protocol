@@ -17,17 +17,23 @@ const DynamicMapView = dynamic(
   }
 );
 
-type FilterType = "all" | "reward" | "sponsored" | "trending" | "nearest";
+type FilterType = "all" | "sponsored" | "nearest";
 
-const FILTERS: { key: FilterType; label: string; icon: string }[] = [
-  { key: "all", label: "All", icon: "Grid" },
-  { key: "reward", label: "Reward Active", icon: "Fire" },
-  { key: "sponsored", label: "Sponsored", icon: "Star" },
-  { key: "trending", label: "Trending", icon: "Bolt" },
-  { key: "nearest", label: "Nearest", icon: "Radar" },
+const FILTERS: { key: FilterType; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "sponsored", label: "Sponsored" },
+  { key: "nearest", label: "Nearby" },
 ];
 
 const SHEET_SNAP_POINTS = [38, 56, 78];
+const DEMO_METRICS = [
+  { label: "Nearby merchants", value: "24" },
+  { label: "Active incentives", value: "61" },
+  { label: "Heatmap nodes", value: "18" },
+  { label: "Avg boost", value: "2.4x" },
+] as const;
+const DEMO_ROUTE_BOOST = "1.4x";
+const DEMO_ROUTE_REWARD = "0.77 USDC";
 
 function formatCoordinate(value: number) {
   return value.toFixed(5);
@@ -50,22 +56,17 @@ export default function HomePage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterType>("all");
   const [sheetHeight, setSheetHeight] = useState(56);
+  const [recenterSignal, setRecenterSignal] = useState(0);
+  const [showLocateToast, setShowLocateToast] = useState(false);
+  const [routeActive, setRouteActive] = useState(false);
   const dragState = useRef<{ startY: number; startHeight: number } | null>(null);
   const sheetHeightRef = useRef(sheetHeight);
 
   const filteredMerchants = useMemo(() => {
     const base = [...merchants];
 
-    if (filter === "reward") {
-      return base.filter((merchant) => merchant.rewardMultiplier >= 1.9);
-    }
-
     if (filter === "sponsored") {
       return base.filter((merchant) => merchant.isSponsored);
-    }
-
-    if (filter === "trending") {
-      return base.filter((merchant) => merchant.isTrending);
     }
 
     if (filter === "nearest") {
@@ -79,23 +80,20 @@ export default function HomePage() {
 
   const deferredMerchants = useDeferredValue(filteredMerchants);
 
-  // Animated counters and mount state
   const [isMounted, setIsMounted] = useState(false);
-  const [currentMerchants, setCurrentMerchants] = useState(0);
-  const [currentQuests, setCurrentQuests] = useState(0);
 
   useEffect(() => {
     setIsMounted(true);
-    if (deferredMerchants.length === 0) return;
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      setCurrentMerchants(prev => Math.min(prev + 1, deferredMerchants.length));
-      setCurrentQuests(prev => Math.min(prev + 2, deferredMerchants.reduce((sum, m) => sum + m.quests.length, 0)));
-      if (step > 60) clearInterval(interval);
-    }, 16);
-    return () => clearInterval(interval);
-  }, [deferredMerchants]);
+  }, []);
+
+  useEffect(() => {
+    if (!showLocateToast) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setShowLocateToast(false), 2600);
+    return () => window.clearTimeout(timeout);
+  }, [showLocateToast]);
 
   const selectedMerchant = useMemo(
     () =>
@@ -105,19 +103,19 @@ export default function HomePage() {
       null,
     [deferredMerchants, featured, selectedId]
   );
-
-  const totalActiveQuests = deferredMerchants.reduce((sum, merchant) => sum + merchant.quests.length, 0);
-  const averageBoost =
-    deferredMerchants.length > 0
-      ? (
-          deferredMerchants.reduce((sum, merchant) => sum + merchant.rewardMultiplier, 0) / deferredMerchants.length
-        ).toFixed(1)
-      : "0.0";
   const topSuggestion = suggestions[0];
+  const nearestMerchant = useMemo(
+    () =>
+      [...deferredMerchants].sort(
+        (left, right) => (left.distance ?? Number.MAX_SAFE_INTEGER) - (right.distance ?? Number.MAX_SAFE_INTEGER)
+      )[0] ?? featured ?? null,
+    [deferredMerchants, featured]
+  );
   const selectedMapMerchant = useMemo(
     () => deferredMerchants.find((merchant) => merchant.id === selectedId) ?? null,
     [deferredMerchants, selectedId]
   );
+  const routeMerchant = selectedMerchant ?? nearestMerchant;
   const locationTimestamp = useMemo(() => {
     if (!lastUpdatedAt) return "Waiting for GPS";
     return `Updated ${new Date(lastUpdatedAt).toLocaleTimeString([], {
@@ -125,6 +123,28 @@ export default function HomePage() {
       minute: "2-digit",
     })}`;
   }, [lastUpdatedAt]);
+
+  function activateRoute(target = routeMerchant) {
+    if (!target) {
+      return;
+    }
+
+    setSelectedId(target.id);
+    setRouteActive(true);
+    setSheetHeight(56);
+  }
+
+  function handleLocateMe() {
+    if (nearestMerchant) {
+      setSelectedId(nearestMerchant.id);
+      setRouteActive(true);
+      setSheetHeight(56);
+    } else {
+      setSelectedId(null);
+    }
+    setRecenterSignal((current) => current + 1);
+    setShowLocateToast(true);
+  }
 
   function snapDrawer(nextHeight: number) {
     const closest = SHEET_SNAP_POINTS.reduce((best, point) =>
@@ -192,6 +212,15 @@ export default function HomePage() {
       <section className="mapExperience">
         <div className="mapWrapper immersiveMap">
           <div className="mapChromeTop">
+            <div className="statsTicker">
+              {DEMO_METRICS.map((metric) => (
+                <div className="tickerChip fancyHover" key={metric.label}>
+                  <span className="tickerLabel">{metric.label}</span>
+                  <strong>{metric.value}</strong>
+                </div>
+              ))}
+            </div>
+
             {topSuggestion ? (
               <div className="aiBanner topGlow">
                 <div className="aiBannerOrb">AI</div>
@@ -199,28 +228,9 @@ export default function HomePage() {
                   <p className="eyebrow">Contextual route</p>
                   <strong>{topSuggestion.reasoning}</strong>
                 </div>
-                <span className="aiBannerConfidence">{Math.round(topSuggestion.confidence * 100)}%</span>
+                <span className="aiBannerConfidence">{DEMO_ROUTE_BOOST}</span>
               </div>
             ) : null}
-
-            <div className="statsTicker">
-              <div className="tickerChip fancyHover">
-                <span className="tickerLabel">Nearby merchants</span>
-                <strong>{currentMerchants}</strong>
-              </div>
-              <div className="tickerChip fancyHover">
-                <span className="tickerLabel">Active incentives</span>
-                <strong>{currentQuests}</strong>
-              </div>
-              <div className="tickerChip fancyHover">
-                <span className="tickerLabel">Heatmap nodes</span>
-                <strong>{heatmapData.length}</strong>
-              </div>
-              <div className="tickerChip fancyHover">
-                <span className="tickerLabel">Avg boost</span>
-                <strong>{averageBoost}x</strong>
-              </div>
-            </div>
           </div>
 
           <div className="filterBar mapFilters">
@@ -231,7 +241,6 @@ export default function HomePage() {
                 onClick={() => setFilter(item.key)}
                 type="button"
               >
-                <span className="filterChipEmoji">{item.icon}</span>
                 {item.label}
               </button>
             ))}
@@ -253,21 +262,27 @@ export default function HomePage() {
               </div>
               <button
                 className="locationRecenterButton"
-                onClick={() => setSelectedId(null)}
+                onClick={handleLocateMe}
                 type="button"
               >
-                Follow me
+                Locate Me
               </button>
             </div>
+            {showLocateToast ? <div className="mapLocateToast">Centered on your location</div> : null}
           </div>
 
           <DynamicMapView
             center={location}
             focusLocation={focusLocation}
+            recenterSignal={recenterSignal}
             userAccuracy={accuracy}
             merchants={deferredMerchants}
             heatmapData={heatmapData}
             selectedMerchantId={selectedMerchant?.id ?? null}
+            routeActive={routeActive}
+            routeMerchant={routeMerchant}
+            routeReward={DEMO_ROUTE_REWARD}
+            routeBoost={DEMO_ROUTE_BOOST}
             onSelectMerchant={(merchant) => setSelectedId(merchant.id)}
           />
 
@@ -295,10 +310,18 @@ export default function HomePage() {
                   <button
                     key={point}
                     className={`drawerSnapButton ${Math.round(sheetHeight) === point ? "active" : ""}`}
-                    onClick={() => setSheetHeight(point)}
+                    onClick={() => {
+                      if (point === 56) {
+                        activateRoute();
+                        return;
+                      }
+
+                      setRouteActive(false);
+                      setSheetHeight(point);
+                    }}
                     type="button"
                   >
-                {point === 38 ? "Peek" : point === 56 ? "Focus" : "Expand"}
+                    {point === 38 ? "Details" : point === 56 ? "Route" : "Rewards"}
                   </button>
                 ))}
               </div>

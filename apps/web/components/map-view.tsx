@@ -7,6 +7,7 @@ import {
   layerGroup,
   Map as LeafletMap,
   marker,
+  polyline,
   tileLayer,
   type LayerGroup,
 } from "leaflet";
@@ -146,6 +147,45 @@ function addMerchant(
   merchantMarker.addTo(layers);
 }
 
+function addRouteVisualization(
+  layers: LayerGroup,
+  userLocation: { lat: number; lng: number },
+  merchant: MerchantPinType
+) {
+  const routePoints: LatLngExpression[] = [
+    [userLocation.lat, userLocation.lng],
+    [merchant.lat, merchant.lng],
+  ];
+
+  polyline(routePoints, {
+    className: "demoRouteLineGlow",
+    color: "#14f195",
+    weight: 14,
+    opacity: 0.18,
+    lineCap: "round",
+    lineJoin: "round",
+  }).addTo(layers);
+
+  polyline(routePoints, {
+    className: "demoRouteLineCore",
+    color: "#ffd166",
+    weight: 4,
+    opacity: 0.95,
+    lineCap: "round",
+    lineJoin: "round",
+    dashArray: "14 10",
+  }).addTo(layers);
+
+  circle([merchant.lat, merchant.lng], {
+    radius: 56,
+    className: "routeDestinationPulse",
+    color: "#ffd166",
+    weight: 1.5,
+    fillColor: "#ffd166",
+    fillOpacity: 0.12,
+  }).addTo(layers);
+}
+
 function removeExistingLeafletInstance(container: HTMLDivElement) {
   const leafletContainer = container as HTMLDivElement & { _leaflet_id?: number };
 
@@ -157,20 +197,30 @@ function removeExistingLeafletInstance(container: HTMLDivElement) {
 type MapViewProps = {
   center: { lat: number; lng: number };
   focusLocation: { lat: number; lng: number };
+  recenterSignal?: number;
   userAccuracy?: number | null;
   merchants: MerchantPinType[];
   heatmapData: HeatmapNode[];
   selectedMerchantId?: string | null;
+  routeActive?: boolean;
+  routeMerchant?: MerchantPinType | null;
+  routeReward?: string;
+  routeBoost?: string;
   onSelectMerchant: (merchant: MerchantPinType) => void;
 };
 
 export function MapView({
   center,
   focusLocation,
+  recenterSignal = 0,
   userAccuracy,
   merchants,
   heatmapData,
   selectedMerchantId,
+  routeActive = false,
+  routeMerchant = null,
+  routeReward = "0.77 USDC",
+  routeBoost = "1.4x",
   onSelectMerchant,
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -220,6 +270,18 @@ export function MapView({
   }, [focusLocation.lat, focusLocation.lng]);
 
   useEffect(() => {
+    if (!recenterSignal) {
+      return;
+    }
+
+    mapRef.current?.flyTo([center.lat, center.lng], 15.6, {
+      animate: true,
+      duration: 0.9,
+      easeLinearity: 0.2,
+    });
+  }, [center.lat, center.lng, recenterSignal]);
+
+  useEffect(() => {
     const overlays = overlayRef.current;
 
     if (!overlays) {
@@ -229,6 +291,10 @@ export function MapView({
     overlays.clearLayers();
     addUserLocation(overlays, [center.lat, center.lng], userAccuracy, userIcon);
 
+    if (routeActive && routeMerchant) {
+      addRouteVisualization(overlays, center, routeMerchant);
+    }
+
     heatmapData.forEach((node, index) => {
       addHeatNode(overlays, node, index);
     });
@@ -236,11 +302,31 @@ export function MapView({
     merchants.forEach((merchant) => {
       addMerchant(overlays, merchant, merchant.id === selectedMerchantId, onSelectMerchant);
     });
-  }, [center.lat, center.lng, heatmapData, merchants, onSelectMerchant, selectedMerchantId, userAccuracy, userIcon]);
+  }, [
+    center,
+    heatmapData,
+    merchants,
+    onSelectMerchant,
+    routeActive,
+    routeMerchant,
+    selectedMerchantId,
+    userAccuracy,
+    userIcon,
+  ]);
 
   return (
     <div className="mapShell">
       <div ref={containerRef} className="mapCanvas" />
+      {routeActive && routeMerchant ? (
+        <div className="demoRouteHud" aria-live="polite">
+          <span className="demoRouteLabel">Route Active</span>
+          <strong>{routeMerchant.name}</strong>
+          <div className="demoRouteChips">
+            <span>{routeReward}</span>
+            <span>{routeBoost} boost</span>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

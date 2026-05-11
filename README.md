@@ -1,16 +1,51 @@
 # PIKO Protocol
 
-AI-powered contributor intelligence and verifiable on-chain reputation infrastructure for decentralized communities.
+Communities waste reward budgets when fake or low-quality contributors farm incentives.
+
+PIKO verifies whether a contribution was real before rewards are issued.
+
+Live demo: `https://piko-protocol-web.vercel.app/`
+
+## 30-Second Understanding
+
+PIKO is a Solana devnet prototype for safer community rewards. A contributor connects a wallet, completes an action, PIKO checks payment/location/identity/risk signals, then approved contributions receive a reward and a proof NFT that judges can inspect in Solana Explorer.
+
+Demo path:
+
+1. Connect wallet.
+2. Perform the contribution action.
+3. See validation and fraud score.
+4. Receive reward and proof NFT.
+5. Inspect the NFT and transaction in Explorer.
+
+## Submission Assets
+
+- Live demo: `https://piko-protocol-web.vercel.app/`
+- Controlled demo flow: `https://piko-protocol-web.vercel.app/demo-flow?demo=1`
+- NFT Explorer: `https://explorer.solana.com/address/CuHFGnfMK4J5aMMbBFT3FJgPjinxp3adKPHNbK5iQRYb?cluster=devnet`
+- Reward transaction: `https://explorer.solana.com/tx/54ZtxcCPbGCcFBD3pVqE7w74EaUsqZeiRPyfhPoqxY441nANBAz2dKbxrh25huMTzJzVzpDKncKpy7usEUtiGYMZ?cluster=devnet`
+- Screenshot 1: [map and merchant opportunity](./apps/web/public/screenshots/01-map-opportunity.png)
+- Screenshot 2: [merchant claim sheet](./apps/web/public/screenshots/02-validation-preview.png)
+- Screenshot 3: [proof NFT](./apps/web/public/screenshots/03-proof-nft.png)
+- Architecture image: see the Mermaid diagram below and [ARCHITECTURE.md](./ARCHITECTURE.md)
+
+![PIKO map and merchant opportunity](./apps/web/public/screenshots/01-map-opportunity.png)
+![PIKO merchant claim sheet](./apps/web/public/screenshots/02-validation-preview.png)
+![PIKO proof NFT](./apps/web/public/screenshots/03-proof-nft.png)
 
 ## Problem
 
-Decentralized communities spend treasury on grants, quests, campaigns, and activation programs, but often lack a credible way to tell which contributions are valuable, human, and repeatable. The result is wasted incentives, weak attribution, and reputation that stays trapped inside one dashboard instead of becoming composable on-chain history.
+Communities spend treasury on grants, quests, campaigns, and activation programs. Fake or low-quality contributors can still farm those rewards because most systems reward the claim, not the verified action.
+
+That creates wasted budgets, weak attribution, and reputation that stays trapped inside one dashboard.
 
 ## Solution
 
-PIKO Protocol turns contribution actions into scored, verifiable reputation events. A contributor completes an action, the system evaluates payment, location, identity signal, behavioral risk, and reward economics, then settles the result on Solana and can mint a proof NFT that is independently inspectable.
+PIKO checks whether a contribution was real before rewards are issued. A contributor completes an action, the system evaluates payment, location, identity signal, behavioral risk, and reward economics, then settles the result on Solana.
 
-This is not presented as complete identity verification or production-grade fraud prevention. The current prototype demonstrates behavioral fraud analysis, reputation scoring, partial World ID-style identity architecture, Solana settlement, and Metaplex proof NFTs.
+Approved actions can mint a Metaplex proof NFT. The proof is portable and independently inspectable.
+
+This is not complete identity verification or production-grade fraud prevention. The prototype demonstrates fraud scoring, deterministic fallback rules, reward optimization, multi-signal validation, Solana settlement, and Metaplex proof NFTs.
 
 ## Why Solana
 
@@ -24,19 +59,19 @@ NFTs are used as portable contribution proofs, not collectibles. The NFT mint li
 
 Lead with three ideas:
 
-- Contributor intelligence: AI scores payment, location, identity, and behavioral signals before rewards settle.
-- Treasury control: reward logic is budget-aware, so communities can fund incentives without treating every action equally.
+- Real contribution checks: PIKO scores payment, location, identity, and behavioral signals before rewards settle.
+- Treasury control: reward logic is budget-aware, so communities do not have to pay every claim equally.
 - Metaplex proofs: each verified contribution can become a portable on-chain reputation artifact.
 
 Full strategy: [COLOSSEUM_STRATEGY.md](./COLOSSEUM_STRATEGY.md)
 
 ## Demo in 10 Seconds
 
-1. Open the map.
-2. Tap the merchant or contribution opportunity.
-3. Connect Phantom and approve the devnet action/payment.
-4. AI evaluates the contribution and reward logic.
-5. PIKO settles and a proof NFT can be verified in Explorer.
+1. Connect Phantom on devnet.
+2. Perform the contribution action.
+3. See PIKO validate payment, location, identity signal, and risk.
+4. Receive the reward and proof NFT.
+5. Inspect the proof in Solana Explorer.
 
 Some internal package names still use the legacy repo namespace for build continuity, but every public-facing surface should present `PIKO Protocol`.
 
@@ -64,12 +99,12 @@ For final submission, record both:
 
 `/?demo=1` is the optional controlled judge path:
 
-1. See one merchant pin: **Cafe Bloom**.
-2. Tap it.
-3. Start the incentive flow, or open the merchant profile to see the economics dashboard.
-4. Run the controlled scoring event.
-5. See a structured decision receipt with fraud score, payment proof, location proof, and final reward.
-6. See the reward and proof NFT result.
+1. Connect wallet.
+2. Choose the Cafe Bloom contribution.
+3. Complete the devnet action/payment.
+4. Watch validation run.
+5. See the decision receipt with fraud score, payment proof, location proof, and final reward.
+6. Open the reward transaction or proof NFT in Explorer.
 
 ## Architecture
 

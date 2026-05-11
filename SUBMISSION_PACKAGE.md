@@ -2,17 +2,17 @@
 
 ## One-Line Pitch
 
-AI-powered contributor intelligence and verifiable on-chain reputation infrastructure for decentralized communities.
+PIKO verifies whether a contribution was real before community rewards are issued.
 
 ## Project Description
 
-Decentralized communities spend treasury on campaigns, quests, grants, and real-world activation, but they often lack reliable contributor intelligence. A wallet can claim a task, but the community still needs to know whether the action was useful, human, paid for, location-valid, and worth the reward.
+Communities waste reward budgets when fake or low-quality contributors farm incentives. A wallet can claim a quest, grant task, event action, or activation campaign, but the community still needs to know whether the action was real and worth paying for.
 
-PIKO Protocol turns contribution actions into scored, verifiable reputation events. A contributor connects a wallet, completes an action, and the system evaluates payment, location, identity signal, behavioral risk, and reward economics. Approved actions settle on Solana and can mint a Metaplex proof NFT that carries contribution metadata.
+PIKO checks the contribution before rewards are issued. A contributor connects a wallet, completes an action, and PIKO evaluates payment, location, identity signal, behavioral risk, and reward economics. Approved actions settle on Solana and can mint a Metaplex proof NFT with contribution metadata.
 
-Solana is the right substrate because reputation events should be cheap, fast, inspectable, and composable. Devnet transactions and proof NFT mints make the demo independently verifiable through Solana Explorer.
+Solana is the right substrate because reward and reputation events should be cheap, fast, inspectable, and composable. Devnet transactions and proof NFT mints make the demo independently verifiable through Solana Explorer.
 
-The prototype includes a Next.js frontend, Express API, AI/fraud scoring package, Postgres state, Solana programs, PIKO reward settlement, and Metaplex proof NFT minting. It is a hackathon-level infrastructure prototype, not a claim of complete Sybil resistance or production-grade fraud prevention.
+The prototype includes a Next.js frontend, Express API, fraud scoring package, Postgres state, Solana programs, PIKO reward settlement, and Metaplex proof NFT minting. It is a hackathon-level prototype, not a claim of complete Sybil resistance or production-grade fraud prevention.
 
 ## Architecture Diagram
 
@@ -20,7 +20,7 @@ The prototype includes a Next.js frontend, Express API, AI/fraud scoring package
 flowchart LR
   A[Contributor / Phantom] --> B[Next.js Frontend]
   B --> C[Express API]
-  C --> D[AI Scoring Engine]
+  C --> D[Fraud + Reward Scoring]
   C --> E[(Postgres)]
   C --> F[Solana Devnet]
   F --> G[PIKO Reward Tx]
@@ -34,15 +34,15 @@ Target length: 2:30-2:45.
 
 ### 0:00-0:20 - Problem
 
-"Communities spend treasury on incentives, quests, and activation campaigns, but they often cannot tell which contributions are valuable, human, and worth rewarding. PIKO turns those actions into scored, verifiable reputation events."
+"Communities waste reward budgets when fake or low-quality contributors farm incentives. PIKO checks whether a contribution was real before rewards are issued."
 
-Show the map or controlled demo screen.
+Show the wallet-ready demo screen.
 
 ### 0:20-0:40 - Solution
 
 "A contributor connects Phantom, completes an action, and PIKO evaluates payment, location, identity signal, behavioral risk, and budget-aware reward logic. Approved actions settle on Solana and mint a portable proof NFT."
 
-Briefly show the architecture diagram.
+Briefly show the architecture diagram, then return to the product flow.
 
 ### 0:40-1:50 - Product Walkthrough
 
@@ -51,7 +51,7 @@ Briefly show the architecture diagram.
 3. Open a quest/contribution flow.
 4. Trigger the payment/action.
 5. Approve the transaction in Phantom.
-6. Show the AI decision receipt.
+6. Show the validation decision receipt.
 7. Show the reward/NFT result.
 
 Cut loading time if devnet RPC is slow.
@@ -68,11 +68,11 @@ Use the verified links below.
 
 ### 2:20-2:45 - Technical Highlight
 
-"The important piece is that the proof is not just a UI badge. The backend mints a Metaplex NFT with structured metadata, and the reward decision is anchored to the payment, identity signal, location signal, fraud score, and reward multiplier."
+"The important piece is that the proof is not just a UI badge. The backend mints a Metaplex NFT with structured metadata, and the reward decision is tied to payment, identity signal, location signal, fraud score, and reward multiplier."
 
 End with the honest scope:
 
-"This is a devnet prototype with behavioral fraud analysis and partial World ID-style identity architecture. The next step is production identity verification, stronger fraud calibration, and community integrations."
+"This is a devnet prototype with behavioral fraud scoring, deterministic fallback rules, and partial World ID-style identity architecture. The next step is production identity verification, stronger fraud calibration, and community integrations."
 
 ## Explorer Links
 
@@ -92,6 +92,8 @@ Use:
 - Reputation scoring
 - Budget-aware reward logic
 - Portable contribution proofs
+- Deterministic fallback rules
+- Multi-signal validation
 - Partial World ID-style identity architecture
 - Devnet Solana settlement
 
@@ -104,13 +106,13 @@ Avoid:
 
 ## Two-Minute Talk Track
 
-"PIKO Protocol is contributor intelligence infrastructure for decentralized communities. Communities spend treasury on quests, grants, events, and activation, but they often cannot tell which actions are valuable or worth rewarding. PIKO evaluates each contribution using payment, location, identity signal, behavioral risk, and reward economics.
+"PIKO helps communities avoid paying for fake or low-quality contributions. Communities spend treasury on quests, grants, events, and activation, but they often cannot tell which actions were real or worth rewarding. PIKO evaluates each contribution using payment, location, identity signal, behavioral risk, and reward economics.
 
-The frontend lets a contributor connect Phantom and complete an action. The backend records the claim, runs AI-assisted scoring, settles the reward on Solana, and can mint a Metaplex proof NFT. That NFT is portable evidence of the contribution, with metadata that can be inspected in Explorer.
+The frontend lets a contributor connect Phantom and complete an action. The backend records the claim, runs fraud and reward scoring, settles the reward on Solana, and can mint a Metaplex proof NFT. That NFT is portable evidence of the contribution, with metadata that can be inspected in Explorer.
 
-Solana matters because this type of reputation event needs to be cheap, fast, and composable. NFTs matter because reputation should not be trapped in our app. AI matters because every contribution should not be rewarded equally; communities need scoring and guardrails before treasury is spent.
+Solana matters because this type of reputation event needs to be cheap, fast, and composable. NFTs matter because reputation should not be trapped in our app. The scoring layer matters because every contribution should not be rewarded equally; communities need guardrails before treasury is spent.
 
-This is a devnet prototype. It demonstrates the full loop, but it does not claim complete Sybil resistance or production-grade fraud prevention. The current version shows behavioral fraud analysis, partial identity architecture, real chain writes, and verifiable proof metadata."
+This is a devnet prototype. It demonstrates the full loop, but it does not claim complete Sybil resistance or production-grade fraud prevention. The current version shows behavioral fraud analysis, deterministic fallback rules, partial identity architecture, real chain writes, and verifiable proof metadata."
 
 ## Final Submission Checklist
 
