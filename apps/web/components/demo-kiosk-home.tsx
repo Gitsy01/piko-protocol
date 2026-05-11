@@ -11,7 +11,7 @@ const DynamicMapView = dynamic(
   () => import("@/components/map-view").then((mod) => mod.MapView),
   {
     ssr: false,
-    loading: () => <div className="mapFallback">Loading demo map...</div>,
+    loading: () => <div className="mapFallback demoMapSkeleton" aria-hidden="true" />,
   }
 );
 
@@ -42,19 +42,19 @@ export function DemoKioskHome() {
     <div className="pageStack demoKioskPage">
       <section className="demoKioskHero">
         <div className="demoKioskCopy">
-          <p className="eyebrow">PIKO Protocol</p>
-          <h1>Verify real contributions before rewards are issued.</h1>
+          <p className="receiptEyebrow">PIKO Protocol</p>
+          <h1>PIKO rewards verified actions instead of reward claims.</h1>
           <p className="heroCopy">
             Communities waste reward budgets when fake or low-quality contributors farm incentives. PIKO checks the action first, then issues the reward and proof.
           </p>
           <div className="demoKioskFlow">
             <div className="demoKioskFlowStep">
               <span>1</span>
-              <strong>Map</strong>
+              <strong>Discover</strong>
             </div>
             <div className="demoKioskFlowStep">
               <span>2</span>
-              <strong>Claim</strong>
+              <strong>Confirm</strong>
             </div>
             <div className="demoKioskFlowStep">
               <span>3</span>
@@ -72,10 +72,10 @@ export function DemoKioskHome() {
         <div className="demoKioskMapCard">
           <div className="demoKioskMapHeader">
             <div>
-              <p className="eyebrow">Demo map</p>
-              <h2>One highlighted contribution.</h2>
+              <p className="receiptEyebrow">Contribution location</p>
+              <h2>Where did this happen?</h2>
             </div>
-            <span className="supportText">Tap the Cafe Bloom pin to continue.</span>
+            <span className="supportText">Tap the merchant pin to continue.</span>
           </div>
 
           <div className="demoKioskMapShell">
@@ -94,10 +94,10 @@ export function DemoKioskHome() {
         <aside className="demoKioskQuestCard">
           {isSelected ? (
             <>
-              <p className="eyebrow">Scripted protocol path</p>
-              <h2>{quest.title}</h2>
+              <p className="receiptEyebrow">Merchant opportunity</p>
+              <h2>Visit {merchant.name}</h2>
               <p className="heroCopy">
-                {merchant.name} in {merchant.district}
+                Earn {quest.rewardAmount} {quest.rewardToken}
               </p>
 
               <div className="demoKioskMeta">
@@ -115,20 +115,16 @@ export function DemoKioskHome() {
                 </div>
               </div>
 
-              <p className="supportText demoKioskHint">
-                Start the flow to see payment, location, identity, fraud score, reward approval, and proof NFT.
-              </p>
-
               <Link className="primaryButton demoKioskCta" href={flowHref}>
-                Start 5 PIKO flow
+                Start {quest.rewardAmount} {quest.rewardToken} flow
               </Link>
             </>
           ) : (
             <div className="demoKioskEmpty">
-              <p className="eyebrow">Step 1</p>
-              <h2>Tap the only merchant pin on the map</h2>
+              <p className="receiptEyebrow">Step 1</p>
+              <h2>Tap the merchant pin on the map</h2>
               <p className="supportText">
-                The controlled route starts when Cafe Bloom is selected. Record the live Phantom flow separately.
+                The controlled demo starts when the merchant is selected.
               </p>
             </div>
           )}

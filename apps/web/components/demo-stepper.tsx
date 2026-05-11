@@ -3,10 +3,10 @@
 import { useDemoContext } from "@/providers/demo-context";
 
 const STEPS = [
-  { key: "discover", label: "Tap Pin" },
-  { key: "pay", label: "Claim & Pay" },
-  { key: "evaluating", label: "AI Verify" },
-  { key: "reward", label: "Get Reward" },
+  { key: "discover", label: "Discover" },
+  { key: "pay", label: "Confirm" },
+  { key: "evaluating", label: "Validate" },
+  { key: "reward", label: "Proof" },
 ] as const;
 
 export function DemoStepper() {

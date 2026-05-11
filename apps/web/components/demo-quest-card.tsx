@@ -19,17 +19,17 @@ export function DemoQuestCard() {
           {merchant.avatar}
         </div>
         <div className="demoQuestMerchantInfo">
-          <p className="eyebrow">Step 2</p>
-          <h2 className="demoQuestMerchantName">{merchant.name}</h2>
+          <p className="receiptEyebrow">Merchant opportunity</p>
+          <h2 className="demoQuestMerchantName">Visit {merchant.name}</h2>
           <p className="demoQuestCategory">
-            {merchant.category} - {merchant.district}
+            {merchant.category} — {merchant.district}
           </p>
         </div>
       </div>
 
       <div className="demoQuestStory">
-        <h3>Claim the 5 PIKO contribution</h3>
-        <p>PIKO will check payment, location, identity signal, and fraud risk before reward settlement.</p>
+        <h3>Earn {quest.rewardAmount} {quest.rewardToken}</h3>
+        <p>PIKO will check payment, location, identity signal, and fraud risk before the reward is settled.</p>
       </div>
 
       <div className="demoQuestMeta">

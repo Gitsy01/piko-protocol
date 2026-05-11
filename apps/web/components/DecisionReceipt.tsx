@@ -7,9 +7,9 @@ interface Props {
 }
 
 function riskBand(score: number) {
-  if (score < 20) return { label: "Low risk", tone: "low" } as const;
-  if (score < 60) return { label: "Medium risk", tone: "medium" } as const;
-  return { label: "High risk", tone: "high" } as const;
+  if (score < 20) return { label: "LOW RISK", tone: "low" } as const;
+  if (score < 60) return { label: "MEDIUM RISK", tone: "medium" } as const;
+  return { label: "HIGH RISK", tone: "high" } as const;
 }
 
 function formatAmount(amount: number) {
@@ -26,11 +26,15 @@ function formatMetaKey(key: string) {
 }
 
 const VerificationRow = ({ ok, label, detail }: { ok: boolean; label: string; detail: string }) => (
-  <li className={`decisionReceiptCheck ${ok ? "passed" : "failed"}`}>
-    <span className="decisionReceiptCheckIcon" aria-hidden="true">
-      {ok ? "OK" : "NO"}
+  <li className={`receiptCheckRow ${ok ? "passed" : "failed"}`}>
+    <span className="receiptCheckIcon" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        {ok
+          ? <path d="M3.5 9l4 4L14.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          : <><path d="M4.5 4.5l9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /><path d="M13.5 4.5l-9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></>}
+      </svg>
     </span>
-    <span>
+    <span className="receiptCheckContent">
       <strong>{label}</strong>
       <small>{detail}</small>
     </span>
@@ -51,7 +55,7 @@ export function DecisionReceipt({ data }: Props) {
       aria-label="Contribution validation receipt"
     >
       <header className="decisionReceiptHero">
-        <p className="eyebrow">Validation receipt</p>
+        <p className="receiptEyebrow">Validation Receipt</p>
         <h2>{data.approved ? "Contribution Verified" : "Contribution Rejected"}</h2>
         <p>
           {data.approved
@@ -60,7 +64,7 @@ export function DecisionReceipt({ data }: Props) {
         </p>
       </header>
 
-      <ul className="decisionReceiptChecks">
+      <ul className="receiptChecklist">
         <VerificationRow
           ok={Boolean(data.txSignature)}
           label="Payment confirmed"
@@ -96,7 +100,16 @@ export function DecisionReceipt({ data }: Props) {
         />
       </ul>
 
-      <div className="decisionReceiptOutcome">
+      {/* Fraud score card */}
+      <div className={`receiptFraudCard ${band.tone}`}>
+        <div className="receiptFraudScore">{data.fraudScore}</div>
+        <div className="receiptFraudMeta">
+          <span className="receiptFraudDenom">/ 100</span>
+          <span className={`receiptFraudLabel ${band.tone}`}>{band.label}</span>
+        </div>
+      </div>
+
+      <div className="receiptOutcomeGrid">
         <div>
           <span>Reward multiplier</span>
           <strong>{data.rewardMultiplier}x</strong>
@@ -110,21 +123,33 @@ export function DecisionReceipt({ data }: Props) {
       </div>
 
       {data.nftMint && data.nftMetadata ? (
-        <div className="decisionReceiptProof">
-          <div>
-            <span>Proof NFT minted</span>
-            <strong>{truncateAddress(data.nftMint)}</strong>
+        <div className="receiptProofCard">
+          <div className="receiptProofIcon" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="3" />
+              <path d="M3 9h18" />
+              <path d="M9 21V9" />
+            </svg>
+          </div>
+          <div className="receiptProofText">
+            <strong>Contribution Proof Issued</strong>
+            <span>Stored on Solana</span>
+            <code className="receiptProofMint">{truncateAddress(data.nftMint)}</code>
           </div>
           {explorerUrl ? (
-            <a href={explorerUrl} target="_blank" rel="noreferrer">
-              Inspect on Explorer
+            <a className="receiptProofLink" href={explorerUrl} target="_blank" rel="noreferrer">
+              View on Explorer
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 3h7v7" />
+                <path d="M13 3L6 10" />
+              </svg>
             </a>
           ) : null}
         </div>
       ) : null}
 
       {data.nftMetadata ? (
-        <dl className="decisionReceiptMetadata" aria-label="Proof NFT metadata">
+        <dl className="receiptMetadataGrid" aria-label="Proof NFT metadata">
           {Object.entries(data.nftMetadata).slice(0, 4).map(([key, value]) => (
             <div key={key}>
               <dt>{formatMetaKey(key)}</dt>

@@ -13,7 +13,7 @@ import { DemoWalletGate } from "@/components/demo-wallet-gate";
 
 const DynamicMapView = dynamic(
   () => import("@/components/map-view").then((module) => module.MapView),
-  { ssr: false, loading: () => <div className="demoMapFallback">Loading map...</div> }
+  { ssr: false, loading: () => <div className="demoMapFallback demoMapSkeleton" aria-hidden="true" /> }
 );
 
 export function DemoPageInner() {

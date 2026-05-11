@@ -1,15 +1,62 @@
-# Brand - PIKO Protocol
+# Brand — PIKO Protocol
 
-_Status: deferred_
+_Status: established_
 
-The user chose to defer brand setup. This project is currently using shadcn's default neutral palette and no custom typography. The `frontend-design-guidelines` skill will quietly use defaults and will not prompt again.
+## Visual Identity
 
-To set up a real brand palette, typography, and voice at any time, run:
+PIKO Protocol is **trust infrastructure** for community rewards. The visual identity reflects this positioning.
 
-    /brand-design
+### Background
 
-or say: "pick brand colors"
+Dark charcoal (`#111116`). Not pure black. Warm enough to feel premium, dark enough to convey authority.
 
-When `brand-design` runs, it will detect this deferred state, skip the "confirm overwrite" step, and proceed directly to the full brand setup. The resulting palette will be applied to `app/globals.css` and this file will be replaced with the real brand documentation.
+### Primary Accent
 
-_Deferred at: 2026-04-20T00:00:00.000Z_
+**Emerald** — `#34d399` (HSL 160, 60%, 52%).
+
+Used consistently as the single accent color for:
+
+- Verification checkmarks
+- Fraud score indicators (low risk)
+- Reward amounts
+- CTAs
+- Proof badges
+
+### Secondary Signals
+
+- Warning: `#f59e0b` (amber, for medium-risk fraud scores and budget guards)
+- Danger: `#ef4444` (red, for high-risk fraud scores and rejection states)
+- Solana Purple: `#9945ff` (reserved for Solana-specific context like program links)
+
+### Typography
+
+- Display: **Syne** (headings, large numbers, hero text)
+- Body: **Space Grotesk** (interface text, labels, descriptions)
+
+Design principles:
+
+- Large headings
+- Semi-bold labels
+- Strong vertical spacing
+- No tiny text
+
+### Design Language
+
+The product should feel:
+
+- Clean
+- Modern
+- Calm
+- Expensive
+
+**Not:**
+
+- Gaming UI
+- Cyberpunk dashboard
+- Crypto terminal
+
+### Core Visual
+
+The **validation receipt** is the main character of the product. It is the proof that the system verified a real-world contribution. Everything else is supporting context.
+
+_Established: 2026-05-12_

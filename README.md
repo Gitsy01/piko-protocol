@@ -1,5 +1,7 @@
 # PIKO Protocol
 
+**PIKO rewards verified actions instead of reward claims.**
+
 Communities waste reward budgets when fake or low-quality contributors farm incentives.
 
 PIKO verifies whether a contribution was real before rewards are issued.
@@ -82,13 +84,14 @@ npm install
 npm run dev
 ```
 
-Open these URLs:
+Open these URLs (production):
 
-- Main app: `http://localhost:3000/`
-- Optional judge kiosk: `http://localhost:3000/?demo=1`
-- Focused controlled flow: `http://localhost:3000/demo-flow?demo=1`
-- Merchant simulation: `http://localhost:3000/merchant/cafe-bloom`
-- System reveal console: `http://localhost:3000/demo`
+- Main app: `https://piko-protocol-web.vercel.app/`
+- Judge kiosk: `https://piko-protocol-web.vercel.app/?demo=1`
+- Controlled flow: `https://piko-protocol-web.vercel.app/demo-flow?demo=1`
+- Merchant simulation: `https://piko-protocol-web.vercel.app/merchant/cafe-bloom`
+
+Local dev equivalents use `http://localhost:3000/` with the same paths.
 
 For final submission, record both:
 

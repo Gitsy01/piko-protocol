@@ -4,10 +4,6 @@ import { useEffect, useState } from "react";
 import { DecisionReceipt } from "@/components/DecisionReceipt";
 import { useDemoContext } from "@/providers/demo-context";
 
-function formatSolAmount(amount: number) {
-  return `${amount.toFixed(2)} SOL`;
-}
-
 function getExplorerUrl(signature: string | null) {
   if (!signature) return null;
   return `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
@@ -26,92 +22,134 @@ export function DemoReward() {
 
   const isApproved = aiEvaluation?.decision === "APPROVED";
   const explorerUrl = getExplorerUrl(rewardResult?.txSignature ?? null);
+  const nftMint = decisionReceipt?.nftMint ?? null;
+  const nftExplorerUrl = nftMint
+    ? `https://explorer.solana.com/address/${nftMint}?cluster=devnet`
+    : null;
 
   useEffect(() => {
-    if (revealStep >= 3) return;
-    const delay = revealStep === 0 ? 300 : 450;
-    const timer = window.setTimeout(() => setRevealStep((current) => current + 1), delay);
+    if (revealStep >= 4) return;
+    const delay = revealStep === 0 ? 200 : 500;
+    const timer = window.setTimeout(() => setRevealStep((c) => c + 1), delay);
     return () => clearTimeout(timer);
   }, [revealStep]);
 
   const showReward = revealStep >= 1;
-  const showExplorer = revealStep >= 2;
+  const showProof = revealStep >= 2;
+  const showExplorer = revealStep >= 3;
   const earnedAmount = rewardResult?.rewardAmount ?? quest.rewardAmount;
   const earnedToken = rewardResult?.rewardToken ?? quest.rewardToken;
 
   return (
     <div
-      className={`aiApprovalCard ${isApproved ? "approved" : "rejected"}`}
+      className={`receiptScreen receiptRewardScreen ${isApproved ? "approved" : "rejected"}`}
       id="demo-reward-screen"
       role="status"
       aria-live="polite"
     >
-      <div className="aiApprovalHeader">
-        <span className="aiApprovalIcon" aria-hidden="true">
-          {isApproved ? "OK" : "NO"}
-        </span>
-        <h2 className="aiApprovalTitle">
-          {isApproved ? "Contribution Verified" : "Reward rejected"}
-        </h2>
-        <p className="aiApprovalSubtitle">
-          {isApproved
-            ? `${earnedAmount.toFixed(2)} ${earnedToken} settled and proof NFT minted.`
-            : "The claim did not pass validation."}
-        </p>
-      </div>
+      <section className={`receiptCard rewardReceiptCard ${isApproved ? "approved" : "rejected"}`}>
 
-      {showReward && isApproved ? (
-        <div className="demoRewardMoment">
-          <p className="eyebrow">Decision Receipt</p>
-          <strong>System-level verification completed</strong>
-          <span>{quest.merchant.name} passed payment, location, identity, and fraud checks before settlement.</span>
-        </div>
-      ) : null}
+        {/* Hero */}
+        <header className="receiptHero">
+          <div className="receiptHeroBadge" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              {isApproved ? <path d="M20 6L9 17l-5-5" /> : <><path d="M18 6L6 18" /><path d="M6 6l12 12" /></>}
+            </svg>
+          </div>
+          <h2 className="receiptHeading">
+            {isApproved ? "Contribution Verified" : "Reward Rejected"}
+          </h2>
+          <p className="receiptSubheading">
+            {isApproved
+              ? "Settlement confirmed and contribution proof issued on Solana devnet."
+              : "The claim did not pass validation. Treasury protected."}
+          </p>
+        </header>
 
-      {showReward && decisionReceipt ? <DecisionReceipt data={decisionReceipt} /> : null}
+        {/* Large reward pill */}
+        {showReward && isApproved ? (
+          <div className="receiptRewardHero">
+            <span className="receiptRewardSign">+</span>
+            <span className="receiptRewardBig">{earnedAmount.toFixed(0)}</span>
+            <span className="receiptRewardTokenBig">{earnedToken}</span>
+          </div>
+        ) : null}
 
-      {showExplorer ? (
-        <div className="aiApprovalBlockchain">
-          {rewardResult?.txSignature ? (
-            <div className="aiApprovalBlockchainRow">
-              <span>Tx Signature</span>
-              <strong>{truncateSignature(rewardResult.txSignature)}</strong>
+        {/* NFT proof card */}
+        {showProof && isApproved ? (
+          <div className="receiptProofCard">
+            <div className="receiptProofIcon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3" />
+                <path d="M3 9h18" />
+                <path d="M9 21V9" />
+              </svg>
             </div>
-          ) : null}
-          <div className="aiApprovalBlockchainRow">
-            <span>Location proof</span>
-            <strong>
-              {Math.round(aiEvaluation?.locationDistanceMeters ?? 42)}m away / {Math.round(aiEvaluation?.gpsAccuracyMeters ?? 9)}m accuracy
-            </strong>
+            <div className="receiptProofText">
+              <strong>Contribution Proof Issued</strong>
+              <span>Stored on Solana</span>
+              {nftMint ? (
+                <code className="receiptProofMint">{truncateSignature(nftMint)}</code>
+              ) : null}
+            </div>
           </div>
-          <div className="aiApprovalBlockchainRow">
-            <span>Payment proof</span>
-            <strong>{formatSolAmount(aiEvaluation?.paymentAmountSol ?? 0.05)}</strong>
-          </div>
-          <div className="aiApprovalActions">
-            {explorerUrl ? (
+        ) : null}
+
+        {/* Decision Receipt (detailed checks) */}
+        {showReward && decisionReceipt ? <DecisionReceipt data={decisionReceipt} /> : null}
+
+        {/* Explorer CTA */}
+        {showExplorer ? (
+          <div className="receiptActions">
+            {nftExplorerUrl ? (
+              <a
+                id="demo-nft-explorer-link"
+                className="receiptExplorerCta"
+                href={nftExplorerUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                View Proof on Explorer
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 3h7v7" />
+                  <path d="M13 3L6 10" />
+                </svg>
+              </a>
+            ) : explorerUrl ? (
               <a
                 id="demo-explorer-link"
-                className="primaryButton aiExplorerButton"
+                className="receiptExplorerCta"
                 href={explorerUrl}
                 target="_blank"
                 rel="noreferrer"
               >
-                View on Solana Explorer
+                View on Explorer
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 3h7v7" />
+                  <path d="M13 3L6 10" />
+                </svg>
               </a>
             ) : null}
+
+            {rewardResult?.txSignature ? (
+              <div className="receiptTxRow">
+                <span>Reward Tx</span>
+                <code>{truncateSignature(rewardResult.txSignature)}</code>
+              </div>
+            ) : null}
+
             <button
               id="demo-do-another-btn"
-              className="demoCta"
+              className="receiptRerunBtn"
               type="button"
               onClick={() => dispatch({ type: "RESET" })}
             >
               Run the demo again
             </button>
           </div>
-        </div>
-      ) : null}
+        ) : null}
 
+      </section>
     </div>
   );
 }

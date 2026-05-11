@@ -13,7 +13,7 @@ const DynamicMapView = dynamic(
   () => import("@/components/map-view").then((mod) => mod.MapView),
   {
     ssr: false,
-    loading: () => <div className="mapFallback">Loading immersive map...</div>,
+    loading: () => <div className="mapFallback mapSkeleton" aria-hidden="true" />,
   }
 );
 

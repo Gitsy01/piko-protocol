@@ -46,7 +46,7 @@ Briefly show the architecture diagram, then return to the product flow.
 
 ### 0:40-1:50 - Product Walkthrough
 
-1. Open `http://localhost:3000/`.
+1. Open `https://piko-protocol.app/` (or your deployed URL).
 2. Connect Phantom on devnet.
 3. Open a quest/contribution flow.
 4. Trigger the payment/action.
